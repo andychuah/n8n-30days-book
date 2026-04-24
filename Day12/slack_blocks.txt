@@ -1,0 +1,70 @@
+// Day 12 — Slack Block Kit JSON（Step 2/2）
+// 使用方式：
+// 1. 在 Slack 節點，Message Type 選「Blocks」
+// 2. 切換到 Expression 模式（點擊欄位右側的 = 符號）
+// 3. 把下方「{{」到「}}」整段（含兩端的雙大括號）貼入 Blocks 欄位
+// 前置：需配合 code.js 的 Code 節點輸出
+
+{{
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "📊 各部門最新週報彙整", "emoji": true }
+    },
+    {
+      "type": "context",
+      "elements": [
+        { "type": "mrkdwn", "text": "📅 *結算日期：* " + $json.date }
+      ]
+    },
+    { "type": "divider" },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "📢 *【行銷部】*" },
+      "fields": [
+        { "type": "mrkdwn", "text": "• *本週發文：* " + ($json.mkt["本週發文數"] || 0) + " 篇" },
+        { "type": "mrkdwn", "text": "• *觸及率：* " + ($json.mkt["觸及率(%)"] || 0) + "%" },
+        { "type": "mrkdwn", "text": "• *新增粉絲：* " + ($json.mkt["新增粉絲數"] || 0) + " 人" }
+      ]
+    },
+    {
+      "type": "context",
+      "elements": [{ "type": "mrkdwn", "text": "📝 *備註：* " + ($json.mkt["備註"] || "無") }]
+    },
+    { "type": "divider" },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "💼 *【業務部】*" },
+      "fields": [
+        { "type": "mrkdwn", "text": "• *新增客戶：* " + ($json.sales["本週新增客戶數"] || 0) + " 家" },
+        { "type": "mrkdwn", "text": "• *成交金額：* $" + Number($json.sales["成交金額(元)"] || 0).toLocaleString() },
+        { "type": "mrkdwn", "text": "• *拜訪次數：* " + ($json.sales["拜訪次數"] || 0) + " 次" }
+      ]
+    },
+    {
+      "type": "context",
+      "elements": [{ "type": "mrkdwn", "text": "📝 *備註：* " + ($json.sales["備註"] || "無") }]
+    },
+    { "type": "divider" },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "🎧 *【客服部】*" },
+      "fields": [
+        { "type": "mrkdwn", "text": "• *處理件數：* " + ($json.cs["本週處理件數"] || 0) + " 件" },
+        { "type": "mrkdwn", "text": "• *平均回應：* " + ($json.cs["平均回應時間(小時)"] || 0) + " 小時" },
+        { "type": "mrkdwn", "text": "• *客戶滿意度：* " + ($json.cs["客戶滿意度(%)"] || 0) + "%" }
+      ]
+    },
+    {
+      "type": "context",
+      "elements": [{ "type": "mrkdwn", "text": "📝 *備註：* " + ($json.cs["備註"] || "無") }]
+    },
+    { "type": "divider" },
+    {
+      "type": "context",
+      "elements": [{ "type": "mrkdwn", "text": "🤖 由 *n8n* 自動解析並產生" }]
+    }
+  ]
+}
+}}

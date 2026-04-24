@@ -1,0 +1,115 @@
+{
+  "name": "Day 24 - 新客戶自動歡迎流程",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "name": "新客戶加入",
+      "parameters": {
+        "sheetId": "YOUR_SHEET_ID",
+        "event": "rowAdded"
+      },
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "name": "整理客戶資料",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "name",
+              "value": "={{ $json.姓名 }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "id": "3",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "name": "寄送歡迎信",
+      "parameters": {
+        "fromEmail": "hello@yourcompany.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=歡迎加入！{{ $json.name }} 😊",
+        "message": "=<h2>嗨，{{ $json.name }}！</h2><p>歡迎加入！我們很高興有你。</p>"
+      },
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "id": "4",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "name": "通知業務團隊",
+      "parameters": {
+        "operation": "sendMessage",
+        "channel": "#new-customers",
+        "text": "=🎉 新客戶加入：*{{ $json.name }}*（{{ $json.email }}）"
+      },
+      "position": [
+        650,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "新客戶加入": {
+      "main": [
+        [
+          {
+            "node": "整理客戶資料",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "整理客戶資料": {
+      "main": [
+        [
+          {
+            "node": "寄送歡迎信",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "通知業務團隊",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 24：新客戶自動歡迎 - Email + Slack 雙重通知"
+}

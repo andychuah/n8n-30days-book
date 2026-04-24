@@ -1,0 +1,311 @@
+{
+  "name": "n8n_book_day13",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "app_mention"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C02G3J2TRM4",
+          "mode": "list",
+          "cachedResultName": "general"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        256
+      ],
+      "id": "02b401a8-99b3-4056-ab17-6dba4b1e1ef9",
+      "name": "Slack Trigger",
+      "webhookId": "4af674d9-18cb-4501-8258-1caf49039c88",
+      "credentials": {
+        "slackApi": {
+          "id": "b1PI17sS8HeM0ssG",
+          "name": "Slack account 444"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "46c9f974-0929-4ba8-8c4c-d37556b8c8d2",
+              "name": "query_keyword",
+              "value": "={{ $json.text.replace(/<@[A-Z0-9]+>\\s*/, '').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        256
+      ],
+      "id": "06ee8a2c-29c7-435a-961d-01cb71306af5",
+      "name": "解析指令"
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $('解析指令').first().json.query_keyword.toLowerCase().trim();\nconst allRows = $input.all();\n\nconst matched = allRows.filter(row => {\n  const dept = row.json['部門']?.toLowerCase();\n  return dept && (query.includes(dept) || dept.includes(query));\n});\n\nif (matched.length === 0) {\n  return [{ json: { found: false, message: `抱歉，找不到「${query}」的週報資料。\\n請輸入正確的部門名稱（行銷、業務、客服）。` } }];\n}\n\nmatched.sort((a, b) => new Date(b.json['Timestamp']) - new Date(a.json['Timestamp']));\nconst r = matched[0].json;\nconst dept = r['部門'];\n\nlet details = '';\nif (dept === '行銷') {\n  details = `📮 本週發文數：${r['本週發文數']} 篇\\n📈 觸及率：${r['觸及率(%)']}%\\n👥 新增粉絲：${r['新增粉絲數']} 人`;\n} else if (dept === '業務') {\n  details = `🤝 新增客戶：${r['本週新增客戶數']} 家\\n💰 成交金額：$${Number(r['成交金額(元)']).toLocaleString()}\\n📞 拜訪次數：${r['拜訪次數']} 次`;\n} else if (dept === '客服') {\n  details = `📋 處理件數：${r['本週處理件數']} 件\\n⏱️ 平均回應：${r['平均回應時間(小時)']} 小時\\n⭐ 客戶滿意度：${r['客戶滿意度(%)']}%`;\n}\n\nconst message = `嗨！幫你找到 ${dept}部門最新週報 📊\\n\\n${details}\\n\\n📅 更新時間：${r['Timestamp']}\\n💬 備註：${r['備註'] || '無'}`;\n\nreturn [{ json: { found: true, message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        256
+      ],
+      "id": "6ad1f6e9-e239-4d26-9a0c-32073e2bc192",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM",
+          "mode": "list",
+          "cachedResultName": "團隊月度績效總表",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "行銷",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        64
+      ],
+      "id": "1ebf1e31-7ec3-4026-9ea8-c3910e2cfe9f",
+      "name": "Get 行銷資料",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RvEhqT3NH9YRz8oY",
+          "name": "Andy Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM",
+          "mode": "list",
+          "cachedResultName": "團隊月度績效總表",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1970121309,
+          "mode": "list",
+          "cachedResultName": "業務",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit#gid=1970121309"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        256
+      ],
+      "id": "8cf4418b-b376-41d0-8429-f7f31089c8e7",
+      "name": "Get 業務資料",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RvEhqT3NH9YRz8oY",
+          "name": "Andy Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM",
+          "mode": "list",
+          "cachedResultName": "團隊月度績效總表",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 377797998,
+          "mode": "list",
+          "cachedResultName": "客服",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit#gid=377797998"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        448
+      ],
+      "id": "9d1e6e3a-1c74-47f4-ba49-8841e3f157da",
+      "name": "Get 客服資料",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RvEhqT3NH9YRz8oY",
+          "name": "Andy Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        240
+      ],
+      "id": "95ad5e7b-2b62-45de-ba27-c3c133cdeb78",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C02G3J2TRM4",
+          "mode": "list",
+          "cachedResultName": "general"
+        },
+        "text": "={{ $json.message }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1104,
+        256
+      ],
+      "id": "939db7e7-5b7e-402b-a295-8e65d4762c4f",
+      "name": "Send a message",
+      "webhookId": "59ab22a6-ca2c-4a14-a72e-2a283961adaf",
+      "credentials": {
+        "slackApi": {
+          "id": "b1PI17sS8HeM0ssG",
+          "name": "Slack account 444"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "解析指令",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "解析指令": {
+      "main": [
+        [
+          {
+            "node": "Get 業務資料",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get 行銷資料",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get 客服資料",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 行銷資料": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 業務資料": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get 客服資料": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2d31f4fe-597d-4d64-8f00-151a5d6a6cab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef3122076c469c01017b1f3c655e97b17f6d96d976a171f896f3767e25e508b6"
+  },
+  "id": "hcbC5tcUUKiWVuoe",
+  "tags": []
+}

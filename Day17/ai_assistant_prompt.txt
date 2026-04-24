@@ -1,0 +1,16 @@
+// Day 17 — 優化 AI Agent System Message Prompt
+// 用途：想讓 AI Agent 的回答品質更好時，貼給 ChatGPT / Claude
+
+我正在使用 n8n 的 AI Agent 節點。
+
+我的使用場景是：
+[描述你的使用場景，例如：處理客服 Email、幫團隊整理週報、回答常見問題]
+
+目前我的 System Message 是：
+[貼上你目前的 System Message]
+
+AI 的回覆有以下問題：
+[描述問題，例如：太冗長、語氣不夠專業、沒有按照格式輸出]
+
+請幫我優化 System Message，讓 AI 的回覆能夠：
+[描述你期望的效果，例如：控制在 100 字以內、用條列格式、一定要附上來源]

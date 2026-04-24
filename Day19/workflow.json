@@ -1,0 +1,77 @@
+{
+  "name": "Day 19 - Webhook 接收即時指令",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "name": "接收 Webhook",
+      "parameters": {
+        "path": "my-webhook",
+        "responseMode": "responseNode",
+        "httpMethod": "POST"
+      },
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "name": "AI 處理指令",
+      "parameters": {
+        "text": "=處理這個指令：{{ $json.body.command }}"
+      },
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "id": "3",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "name": "回傳結果",
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, result: $json.output } }}"
+      },
+      "position": [
+        650,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "接收 Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI 處理指令",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI 處理指令": {
+      "main": [
+        [
+          {
+            "node": "回傳結果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 19：Webhook 節點 - 接收外部即時指令"
+}

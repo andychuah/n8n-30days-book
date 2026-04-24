@@ -1,0 +1,15 @@
+// Day 15 — Switch 節點設定問題求助 Prompt
+// 用途：Switch 節點設定有問題時，貼給 AI 助手並附上截圖
+
+我在用 n8n 打造一個 Slack Bot，需要根據使用者輸入的不同指令走不同分支：
+
+@bot 笑話 → 呼叫 Official Joke API 取得笑話
+@bot 貓咪 → 呼叫 Cat Facts API 取得貓咪冷知識
+@bot 幫助 → 直接回覆固定的使用說明
+
+我已經用 Set 節點提取出指令關鍵字，存在 command 欄位。
+
+現在我想設定 Switch 節點，請告訴我：
+1. Switch 節點的 Mode 應該選什麼？
+2. 三條 Routing Rules 應該如何填寫？
+3. 如果指令不符合任何條件，應該如何設定 Fallback？

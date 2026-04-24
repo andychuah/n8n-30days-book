@@ -1,0 +1,141 @@
+{
+  "name": "Day 7 - IF 節點智慧判斷",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "name": "每日觸發",
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
+      },
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "name": "RSS 讀取",
+      "parameters": {
+        "url": "https://example.com/feed.xml"
+      },
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "id": "3",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "name": "判斷是否今日",
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.pubDate }}",
+              "rightValue": "={{ $now.minus(1, 'day').toISO() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ]
+        }
+      },
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "id": "4",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "name": "寄送新文章通知",
+      "parameters": {
+        "fromEmail": "your@email.com",
+        "toEmail": "you@email.com",
+        "subject": "=新文章：{{ $json.title }}"
+      },
+      "position": [
+        850,
+        200
+      ]
+    },
+    {
+      "id": "5",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "name": "寄送無更新通知",
+      "parameters": {
+        "fromEmail": "your@email.com",
+        "toEmail": "you@email.com",
+        "subject": "今日無新文章"
+      },
+      "position": [
+        850,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "每日觸發": {
+      "main": [
+        [
+          {
+            "node": "RSS 讀取",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS 讀取": {
+      "main": [
+        [
+          {
+            "node": "判斷是否今日",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "判斷是否今日": {
+      "main": [
+        [
+          {
+            "node": "寄送新文章通知",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "寄送無更新通知",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 7：IF 節點 - 根據條件走不同分支"
+}

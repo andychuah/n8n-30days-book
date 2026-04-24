@@ -1,0 +1,18 @@
+// Day 16 — 第二週總結：請 AI 幫你找辦公室自動化機會 Prompt
+// 用途：完成第二週後，請 AI 幫你分析辦公室痛點並設計解決方案
+
+我剛學完 n8n 第二週（Day 10-16），已經學會了：
+- Google Sheets 資料整合
+- Code 節點寫報告
+- Slack 通知與機器人
+- HTTP Request API 串接
+- Switch 節點多分支邏輯
+- Google Forms 自動化
+
+我的工作使用到的工具有：
+[列出你的工作工具，例如：Gmail, Slack, Google Sheets, Notion, Jira 等]
+
+請幫我：
+1. 找出 3 個最值得自動化的辦公室流程
+2. 設計每個流程的 n8n 工作流架構
+3. 預估每個流程能節省多少時間

@@ -1,0 +1,58 @@
+{
+  "name": "Day 3 - 第一個 n8n 工作流",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "name": "手動觸發",
+      "parameters": {},
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "name": "設定訊息",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "message",
+              "value": "Hello from n8n! 你的第一個自動化成功了 🎉",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        450,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "手動觸發": {
+      "main": [
+        [
+          {
+            "node": "設定訊息",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 3：你的第一個 n8n 工作流 - 用 Set 節點設定一個訊息"
+}

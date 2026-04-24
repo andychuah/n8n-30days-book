@@ -1,0 +1,200 @@
+{
+  "name": "n8n_book_d18",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.chatInput }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "你是一位專業且友善的客服人員。  這是一封客戶來信，請你根據信件內容，參考以下公司政策，草擬一封專業的回覆：  公司退貨政策： - 商品可在購買後 7 天內無條件退貨 - 退貨商品須保持原包裝完整 - 退款將在收到退貨後 3-5 個工作天內處理  請確保回覆： 1. 感謝客戶的來信 2. 清楚說明退貨流程 3. 語氣專業但親切"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        -16
+      ],
+      "id": "bc34ddfb-ca56-448a-9cea-5f3bfbf848d6",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2UQWMg6VZejfU8DU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1052abbd-2d77-4116-89cb-31edcfbd7cc2",
+              "name": "chatInput",
+              "value": "你好，我想請問一下，如果我在你們網站上買的商品不滿意，退貨的流程是什麼？謝謝。",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        -16
+      ],
+      "id": "5a32f614-33fe-45ad-9439-178788689168",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "andychuah99@gmail.com",
+        "subject": "Approval Required",
+        "message": "={{ $json.content.parts[0].text }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        -16
+      ],
+      "id": "005ccd20-8538-4e51-86ef-eab10043a6cb",
+      "name": "Human Review",
+      "webhookId": "b91d43ef-2e60-4202-b5b3-b24abd2cf3ab",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z65EgkvAEY5Z1Mvq",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "andy.chuah@appier.com",
+        "subject": "xx",
+        "message": "xx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "81a2f55f-ad2b-4e7e-9cca-d326e0977d97",
+      "name": "回信",
+      "webhookId": "71130523-0971-4c94-8c72-02f63e19842c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z65EgkvAEY5Z1Mvq",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "18298230-32e9-44f0-bef0-e82fa742423b",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z65EgkvAEY5Z1Mvq",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Human Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Review": {
+      "main": [
+        [
+          {
+            "node": "回信",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c72a83e4-dfd1-4143-9d22-b1d690b9b53d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "mzH8SytXCWZwPIUE",
+  "tags": []
+}

@@ -1,0 +1,15 @@
+// Day 5 — Gmail 寄信設定問題求助 Prompt
+// 用途：Send Email 節點設定 Gmail 時遇到問題，貼給 AI 助手
+
+我正在設定 n8n 的 Send Email 節點，使用 Gmail 寄信。
+
+我的設定是：
+- Host: smtp.gmail.com
+- User: [我的 Gmail]
+- Password: [我的應用程式密碼]（不是登入密碼！）
+
+我遇到的錯誤訊息是：
+[貼上錯誤訊息]
+
+請幫我分析可能的原因，並告訴我怎麼解決。
+用繁體中文回答，並用初學者能理解的方式說明。

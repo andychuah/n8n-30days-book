@@ -1,0 +1,21 @@
+<!-- Day 24 — 新客戶歡迎信 HTML 模板 -->
+<!-- 使用方式：在 Send Email 節點的 Body 欄位，切換到 HTML 模式，貼上此內容 -->
+<!-- 注意：其中 {{ $json.xxx }} 的部分需切換到 Expression 模式才能生效 -->
+
+<p>{{ $json.contact_person }} 您好，</p>
+
+<p>非常感謝您選擇與我們合作！</p>
+
+<p>我們已經為您的專案準備好了以下資源：</p>
+
+<ul>
+  <li>專案追蹤：<a href="{{ $json.jira_url }}">Jira 專案</a></li>
+  <li>資料頁面：<a href="{{ $json.notion_url }}">Notion 頁面</a></li>
+  <li>共用資料夾：<a href="{{ $json.drive_url }}">Google Drive</a></li>
+</ul>
+
+<p>我們的團隊會盡快與您聯繫，討論專案的下一步。</p>
+
+<p>如有任何問題，請隨時與我們聯繫。</p>
+
+<p>祝合作愉快！</p>

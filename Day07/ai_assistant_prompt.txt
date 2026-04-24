@@ -1,0 +1,13 @@
+// Day 7 — 幫我寫 Code 節點程式碼 Prompt
+// 用途：需要 AI 幫你寫 Code 節點的 JavaScript 時，貼給 ChatGPT / Claude
+
+我正在使用 n8n 的 Code 節點。
+
+我的輸入資料格式是：
+[貼上你的 JSON 資料結構，例如：{"title": "文章標題", "link": "網址", "author": "作者"}]
+
+我想要做的事情是：
+[描述你的需求，例如：把多筆資料的 title 和 link 合併成一段文字，然後在最後加上「由 n8n 自動整理」]
+
+請幫我寫一段 JavaScript 程式碼，可以直接貼到 n8n 的 Code 節點使用。
+並解釋這段程式碼每一行在做什麼。

@@ -1,0 +1,120 @@
+{
+  "name": "Day 6 - 定時 RSS 監測（排程版）",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "name": "每天早上 8 點",
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        },
+        "triggerAtHour": 8
+      },
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "name": "RSS 讀取",
+      "parameters": {
+        "url": "https://example.com/feed.xml"
+      },
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "id": "3",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "name": "過濾今日文章",
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.pubDate }}",
+              "rightValue": "={{ $now.minus(1, 'day').toISO() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ]
+        }
+      },
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "id": "4",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "name": "寄送 Email",
+      "parameters": {
+        "fromEmail": "your@email.com",
+        "toEmail": "recipient@email.com",
+        "subject": "=📰 今日新文章：{{ $json.title }}"
+      },
+      "position": [
+        850,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "每天早上 8 點": {
+      "main": [
+        [
+          {
+            "node": "RSS 讀取",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS 讀取": {
+      "main": [
+        [
+          {
+            "node": "過濾今日文章",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "過濾今日文章": {
+      "main": [
+        [
+          {
+            "node": "寄送 Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 6：排程觸發 - 每天自動執行 RSS 監測"
+}

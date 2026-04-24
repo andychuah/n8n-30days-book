@@ -1,0 +1,348 @@
+{
+  "name": "n8n_book_day15",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "app_mention"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C02G3J2TRM4",
+          "mode": "list",
+          "cachedResultName": "general"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "02b401a8-99b3-4056-ab17-6dba4b1e1ef9",
+      "name": "Slack Trigger",
+      "webhookId": "4af674d9-18cb-4501-8258-1caf49039c88",
+      "credentials": {
+        "slackApi": {
+          "id": "b1PI17sS8HeM0ssG",
+          "name": "Slack account 444"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "46c9f974-0929-4ba8-8c4c-d37556b8c8d2",
+              "name": "command",
+              "value": "={{ $json.text.split(\" \").slice(1).join(\" \").trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        400
+      ],
+      "id": "06ee8a2c-29c7-435a-961d-01cb71306af5",
+      "name": "解析指令"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "笑話",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "173c932d-483e-4a2d-be57-a0d4cc0cd1f6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "笑話"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9286cd11-aec6-473f-ab21-4810871ced81",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "貓咪",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "貓咪"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0b2d54cd-cb11-4d76-9b2d-1adda1a8c568",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "幫助",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "幫助"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        384
+      ],
+      "id": "04682576-d124-468b-89a7-568015c9c90b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "https://official-joke-api.appspot.com/random_joke",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        208
+      ],
+      "id": "714b8582-fa4b-4b3d-9d81-c52d4b79994a",
+      "name": "笑話 API"
+    },
+    {
+      "parameters": {
+        "url": "https://catfact.ninja/fact",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        400
+      ],
+      "id": "83cd36e0-9de2-4d5e-94c9-044cee85151d",
+      "name": "貓咪 API"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C02G3J2TRM4",
+          "mode": "list",
+          "cachedResultName": "general"
+        },
+        "text": "=👋 我是你的 n8n Bot！\n@bot 笑話 - 聽一則笑話\n@bot 貓咪 - 看貓咪冷知識\n@bot 幫助 - 顯示這則說明",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        672,
+        592
+      ],
+      "id": "a0544453-d179-40ba-b898-d22cb73ee8fc",
+      "name": "回覆幫助",
+      "webhookId": "0279b0c4-ca87-4068-b66b-919a359411be",
+      "credentials": {
+        "slackApi": {
+          "id": "b1PI17sS8HeM0ssG",
+          "name": "Slack account 444"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C02G3J2TRM4",
+          "mode": "list",
+          "cachedResultName": "general"
+        },
+        "text": "=🐱 貓咪冷知識：{{ $json.fact }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        896,
+        400
+      ],
+      "id": "ff7519e8-9478-4468-93e7-8b858da2a4c7",
+      "name": "回覆貓咪",
+      "webhookId": "0279b0c4-ca87-4068-b66b-919a359411be",
+      "credentials": {
+        "slackApi": {
+          "id": "b1PI17sS8HeM0ssG",
+          "name": "Slack account 444"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C02G3J2TRM4",
+          "mode": "list",
+          "cachedResultName": "general"
+        },
+        "text": "={{ $json.setup }} ... {{ $json.punchline }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        896,
+        208
+      ],
+      "id": "b09feddd-5a0e-4171-95bd-b1137ad4b035",
+      "name": "回覆笑話",
+      "webhookId": "4e813ca3-3a5a-4d4d-bff6-60ea970115c3",
+      "credentials": {
+        "slackApi": {
+          "id": "b1PI17sS8HeM0ssG",
+          "name": "Slack account 444"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "解析指令",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "解析指令": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "笑話 API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "貓咪 API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "回覆幫助",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "笑話 API": {
+      "main": [
+        [
+          {
+            "node": "回覆笑話",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "貓咪 API": {
+      "main": [
+        [
+          {
+            "node": "回覆貓咪",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "回覆幫助": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "19bbba6b-dc67-44ba-ad98-ad5e2c4507ba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef3122076c469c01017b1f3c655e97b17f6d96d976a171f896f3767e25e508b6"
+  },
+  "id": "hcbC5tcUUKiWVuoe",
+  "tags": []
+}

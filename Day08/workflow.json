@@ -1,0 +1,162 @@
+{
+  "name": "Day 8 - Merge 多來源 RSS",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "name": "每日觸發",
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
+      },
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "name": "RSS 來源一",
+      "parameters": {
+        "url": "https://source1.com/feed.xml"
+      },
+      "position": [
+        450,
+        200
+      ]
+    },
+    {
+      "id": "3",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "name": "RSS 來源二",
+      "parameters": {
+        "url": "https://source2.com/feed.xml"
+      },
+      "position": [
+        450,
+        400
+      ]
+    },
+    {
+      "id": "4",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "name": "合併所有來源",
+      "parameters": {
+        "mode": "append"
+      },
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "id": "5",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "name": "整理彙整訊息",
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet body = '📢 今日更新彙整：\\n\\n';\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i].json;\n  body += `${i+1}. ${item.title}\\n   🔗 ${item.link}\\n`;\n}\nbody += '\\n---\\n由 n8n 自動整理發送';\nreturn [{ json: { body } }];"
+      },
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "id": "6",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "name": "寄送彙整報告",
+      "parameters": {
+        "fromEmail": "your@email.com",
+        "toEmail": "you@email.com",
+        "subject": "📰 今日創作者更新彙整"
+      },
+      "position": [
+        1050,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "每日觸發": {
+      "main": [
+        [
+          {
+            "node": "RSS 來源一",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RSS 來源二",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS 來源一": {
+      "main": [
+        [
+          {
+            "node": "合併所有來源",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS 來源二": {
+      "main": [
+        [
+          {
+            "node": "合併所有來源",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "合併所有來源": {
+      "main": [
+        [
+          {
+            "node": "整理彙整訊息",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "整理彙整訊息": {
+      "main": [
+        [
+          {
+            "node": "寄送彙整報告",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 8：Merge 節點 - 同時監測多個創作者"
+}

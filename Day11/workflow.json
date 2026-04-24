@@ -1,0 +1,270 @@
+{
+  "name": "n8n_book_day11",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 55
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        416
+      ],
+      "id": "164c88e9-e0b2-4aa6-9985-ba798a01feec",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM",
+          "mode": "list",
+          "cachedResultName": "團隊月度績效總表",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "行銷",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        224
+      ],
+      "id": "fa1437ee-cb3a-4330-90aa-e9007486a443",
+      "name": "Get 行銷資料",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RvEhqT3NH9YRz8oY",
+          "name": "Andy Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 取得所有輸入的資料\nconst items = $input.all();\n\n// 找出資料中最新的日期（以毫秒為單位）\nlet latestTimestamp = 0;\nitems.forEach(item => {\n  const ts = new Date(item.json['Timestamp']).getTime();\n  if (ts > latestTimestamp) latestTimestamp = ts;\n});\n\n// 將最新日期格式化為台灣時間字串\nconst latestDateStr = new Date(latestTimestamp).toLocaleDateString('zh-TW', {\n  timeZone: 'Asia/Taipei',\n  year: 'numeric', \n  month: 'long', \n  day: 'numeric'\n});\n\n// 篩選出「最新一週」的所有部門資料\nconst latestEntries = items.filter(item => {\n  const ts = new Date(item.json['Timestamp']).getTime();\n  return ts === latestTimestamp;\n});\n\n// 分別抓取各部門的最新資料（若無資料則給予空物件以防報錯）\nconst mktData = latestEntries.find(e => e.json['部門'] === '行銷')?.json || {};\nconst salesData = latestEntries.find(e => e.json['部門'] === '業務')?.json || {};\nconst csData = latestEntries.find(e => e.json['部門'] === '客服')?.json || {};\n\n// 撰寫各部門總結報告\nconst report = `\n📊 各部門最新週報彙整\n━━━━━━━━━━━━━━━━━━━━━━\n📅 結算日期：${latestDateStr}\n\n📢 【行銷部】\n• 本週發文數：${mktData['本週發文數'] || 0} 篇\n• 觸及率：${mktData['觸及率(%)'] || 0}%\n• 新增粉絲：${mktData['新增粉絲數'] || 0} 人\n📝 備註：${mktData['備註'] || '無'}\n\n💼 【業務部】\n• 新增客戶：${salesData['本週新增客戶數'] || 0} 家\n• 成交金額：$${Number(salesData['成交金額(元)'] || 0).toLocaleString('zh-TW')} 元\n• 拜訪次數：${salesData['拜訪次數'] || 0} 次\n📝 備註：${salesData['備註'] || '無'}\n\n🎧 【客服部】\n• 處理件數：${csData['本週處理件數'] || 0} 件\n• 平均回應：${csData['平均回應時間(小時)'] || 0} 小時\n• 客戶滿意度：${csData['客戶滿意度(%)'] || 0}%\n📝 備註：${csData['備註'] || '無'}\n\n━━━━━━━━━━━━━━━━━━━━━━\n🤖 由 n8n 自動產生\n`.replace(/^\\s+/gm, ''); // 移除多餘縮排，確保靠左對齊\n\n// 回傳報告\nreturn [{ json: { report: report } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        416
+      ],
+      "id": "dc46a653-2d38-4446-9146-3d4ced884c68",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM",
+          "mode": "list",
+          "cachedResultName": "團隊月度績效總表",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1970121309,
+          "mode": "list",
+          "cachedResultName": "業務",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit#gid=1970121309"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        416
+      ],
+      "id": "390baa37-3fca-46fe-b9ea-c22fcc4e75a5",
+      "name": "Get 業務資料",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RvEhqT3NH9YRz8oY",
+          "name": "Andy Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM",
+          "mode": "list",
+          "cachedResultName": "團隊月度績效總表",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 377797998,
+          "mode": "list",
+          "cachedResultName": "客服",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19gNteKXPq8hj2SvNEfAs6ZAAtYzWQJ7BvzC3rGJROkM/edit#gid=377797998"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        608
+      ],
+      "id": "1de2a506-160b-4f85-a8f8-9aecb33245ad",
+      "name": "Get 客服資料",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RvEhqT3NH9YRz8oY",
+          "name": "Andy Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        400
+      ],
+      "id": "fbfe8d2d-bdc6-4c12-ab93-799537901206",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fromEmail": "andychuah99@gmail.com",
+        "toEmail": "andychuah99@gmail.com",
+        "subject": "各部門最新週報彙整",
+        "emailFormat": "text",
+        "text": "={{ $json.report }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        416
+      ],
+      "id": "a482e19a-afe3-4b9f-9c9c-2b6f62483969",
+      "name": "Send email",
+      "webhookId": "6ea3459d-79e3-4fb0-9a75-3fc7e7dc126b",
+      "credentials": {
+        "smtp": {
+          "id": "Q0ozYsgYzipVs72a",
+          "name": "SMTP account (Andy Test)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get 行銷資料",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get 業務資料",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get 客服資料",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 行銷資料": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 客服資料": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Get 業務資料": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4d47062d-6fc5-452e-98c7-602a6b96d7cf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef3122076c469c01017b1f3c655e97b17f6d96d976a171f896f3767e25e508b6"
+  },
+  "id": "loVqSqSXiT9St5j6",
+  "tags": []
+}

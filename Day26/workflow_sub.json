@@ -1,0 +1,85 @@
+{
+  "name": "Sub - AI 文字處理器",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "prompt"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ff41667a-5cbe-47c4-b98c-ebff9e183006",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "你是一個全能且具備高度語境適應力的「專業文字助理」。\n你的工作是根據使用者提供的【指令】，對【內容】進行精準的處理或擴寫。\n\n【核心處理原則】：\n1. 語言優先：除非指令另有要求，否則請一律使用「繁體中文」輸出。\n2. 動態語氣切換：請根據指令的「任務類型」自動調整說話風格：\n   - 撰寫 Slack/社群訊息：輕鬆、自然、可適度使用 Emoji。\n   - 撰寫 Email/公文：專業、得體、結構完整（包含稱呼與結語）。\n   - 摘要/翻譯/分析：客觀、精確、簡潔。\n3. 內容生成邊界：\n   - 若為「總結/改寫」，請忠於原文，切勿捏造事實。\n   - 若為「草擬/回覆」，允許你根據上下文情境，合理地補充必要的問候、過場語或結尾，讓文句通順自然。\n4. 長度控制：請依照該任務在真實世界中最適合的長度來撰寫。若指令中有明確字數限制，請嚴格遵守。\n\n【輸入資料格式】：\n【指令】：（你要完成的任務目標與情境）\n【內容】：（需要處理的參考資訊或草稿）\n\n請直接輸出最終的文字結果，不需要重複指令或解釋你的思考過程。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e40c6c60-6f52-4d51-abe0-0334e6669c4b",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2UQWMg6VZejfU8DU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5c0e325e-c11c-4010-b3c5-aff13a7c91b4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "uie9Qey8CXhMHHRu",
+  "tags": []
+}

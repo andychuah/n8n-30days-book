@@ -1,0 +1,20 @@
+// Day 21 — 優化 Slack Bot System Message Prompt
+// 用途：想讓 Slack AI Bot 的回答品質更好時，貼給 ChatGPT / Claude
+
+我正在用 n8n 打造一個 Slack AI Bot，想優化 System Message 的設計。
+
+我的 Bot 的主要使用場景是：
+[描述你的場景，例如：公司內部 IT 支援機器人、行銷團隊資料查詢 Bot]
+
+目前我的 System Message 是：
+[貼上你的 System Message]
+
+我希望它能改善：
+[例如：回答太長、語氣太正式、不會承認不知道]
+
+請幫我改寫 System Message，讓 Bot 能夠：
+1. 更精準地回答問題
+2. 保持一致的語氣
+3. 在不確定時正確表達不確定性
+
+用繁體中文回答。

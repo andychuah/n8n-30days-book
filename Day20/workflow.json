@@ -1,0 +1,65 @@
+{
+  "name": "Day 20 - AI Agent 上網搜尋",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "name": "手動觸發",
+      "parameters": {},
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "name": "AI 搜尋 Agent",
+      "parameters": {
+        "text": "=請幫我搜尋並整理最新的 n8n 自動化教學資源",
+        "options": {
+          "maxIterations": 5
+        }
+      },
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "id": "3",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1,
+      "name": "Serper 搜尋工具",
+      "parameters": {
+        "url": "https://google.serper.dev/search",
+        "description": "搜尋網路上的最新資訊"
+      },
+      "position": [
+        250,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "手動觸發": {
+      "main": [
+        [
+          {
+            "node": "AI 搜尋 Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 20：AI Agent 賦予搜尋能力 - 讓 AI 自動上網找資料"
+}

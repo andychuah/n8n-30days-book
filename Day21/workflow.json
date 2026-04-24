@@ -1,0 +1,173 @@
+{
+  "name": "n8n_book_day21",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "app_mention"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C02G3J2TRM4",
+          "mode": "list",
+          "cachedResultName": "general"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        192
+      ],
+      "id": "187bec00-2e07-4c6f-9446-22d84d3df3e5",
+      "name": "Slack Trigger",
+      "webhookId": "4af674d9-18cb-4501-8258-1caf49039c88",
+      "credentials": {
+        "slackApi": {
+          "id": "8QwjAIhSXjtx1mny",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "46c9f974-0929-4ba8-8c4c-d37556b8c8d2",
+              "name": "command",
+              "value": "={{ $json.text.split(\" \").slice(1).join(\" \").trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "c3ab23a8-5c64-42bb-9478-b9419528e6bd",
+              "name": "channel_id",
+              "value": "={{ $json.channel }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        192
+      ],
+      "id": "be3277e5-444e-415b-9bff-9f87b80ed116",
+      "name": "解析指令"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.command }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "你是一個親切、幽默的辦公室 Slack Bot，名叫「小 n」。 你服務的是一個台灣的科技團隊，請用繁體中文回答所有問題。  你的能力包括： - 回答各種工作相關問題 - 說笑話、分享冷知識 - 幫忙寫摘要、整理重點 - 等等  請注意： - 回答要簡潔，不超過 200 字 - 語氣輕鬆、有親和力 - 如果不知道答案，誠實說「這個我不確定，建議你查一下！」"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        192
+      ],
+      "id": "105a3df9-b8b3-4478-91b7-e28071bf496b",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2UQWMg6VZejfU8DU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $('解析指令').item.json.channel_id }}",
+          "mode": "id"
+        },
+        "text": "={{ $json.content.parts[0].text }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        80,
+        192
+      ],
+      "id": "e260817e-1d72-4d72-871d-c1367e829e88",
+      "name": "回覆訊息",
+      "webhookId": "0279b0c4-ca87-4068-b66b-919a359411be",
+      "credentials": {
+        "slackApi": {
+          "id": "8QwjAIhSXjtx1mny",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "解析指令",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "解析指令": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "回覆訊息",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9497ca41-dcac-402a-a517-004d3a4eb5e5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "xXBch8iDjkU8Tx5l",
+  "tags": []
+}

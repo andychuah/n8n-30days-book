@@ -1,0 +1,58 @@
+{
+  "name": "Day 26 - 主工作流（呼叫子流程）",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "name": "每日觸發",
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
+      },
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "name": "執行：寄送報告",
+      "parameters": {
+        "workflowId": "SUB_WORKFLOW_ID_HERE",
+        "waitForSubWorkflow": true
+      },
+      "position": [
+        450,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "每日觸發": {
+      "main": [
+        [
+          {
+            "node": "執行：寄送報告",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 26：主工作流 - 呼叫子流程模組"
+}

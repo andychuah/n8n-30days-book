@@ -1,0 +1,65 @@
+{
+  "name": "Day 17 - AI Agent 工作流",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "name": "手動觸發",
+      "parameters": {},
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "name": "AI Agent",
+      "parameters": {
+        "text": "=你是一個專業的文章摘要助理。請幫我摘要以下文章：\n{{ $json.content }}",
+        "options": {}
+      },
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "id": "3",
+      "type": "@n8n/n8n-nodes-langchain.lmOpenAi",
+      "typeVersion": 1,
+      "name": "OpenAI GPT-4",
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "position": [
+        250,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "手動觸發": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 17：AI Agent 節點 - 讓 n8n 擁有 AI 思考能力"
+}

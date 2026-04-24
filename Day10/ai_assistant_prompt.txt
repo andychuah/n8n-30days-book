@@ -1,0 +1,17 @@
+// Day 10 — Google Sheets 整合問題求助 Prompt
+// 用途：Google Sheets Trigger 或寫入設定有問題時，貼給 AI 助手並附上截圖
+
+我正在設定 n8n 的 Google Sheets 整合。
+
+我的部門 Sheet 有以下欄位：
+[列出你的表單欄位，例如：Timestamp, 部門, 本週發文數, 觸及率, 備註]
+
+我想要把資料寫入另一個 Google Sheets 的特定分頁。
+
+我遇到的問題是：
+[描述問題，例如：Trigger 沒有觸發 / 資料寫錯欄位]
+
+請幫我：
+1. 確認我的設定是否正確
+2. 告訴我正確的 Expression 寫法
+3. 解釋可能的錯誤原因

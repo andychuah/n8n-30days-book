@@ -1,0 +1,25 @@
+// Day 30 — 制定我的 n8n 持續成長計畫 Prompt
+// 用途：30 天結束後，用這個 Prompt 請 AI 幫你規劃後續學習路線
+
+我剛完成 n8n 30 天自動化挑戰！
+
+目前我已經學會的技能：
+- RSS 資料抓取、Filter、Merge
+- Schedule 定時觸發
+- IF / Switch 條件判斷
+- Code 節點 JavaScript
+- Google Sheets 整合
+- Slack Bot（規則型 + AI 型）
+- HTTP Request API 串接
+- AI Agent + Tools
+- Webhook 接收
+- 錯誤處理機制
+- 子工作流模組化
+
+我最想繼續深入的方向是：
+[例如：AI 相關應用 / 更複雜的資料處理 / 更多 SaaS 整合 / 開始為客戶建立自動化]
+
+請幫我規劃：
+1. 接下來 1 個月的學習重點
+2. 推薦的 3 個進階挑戰專案
+3. 值得學習的相關技術（例如：基本 API 知識、資料庫等）

@@ -1,0 +1,17 @@
+// Day 6 — Schedule 排程設定問題求助 Prompt
+// 用途：Schedule 觸發器設定有問題時，貼給 AI 助手
+
+我正在設定 n8n 的 Schedule 觸發器。
+
+我的設定是：
+- Trigger Interval: [你的設定，例如：Days]
+- Trigger at Hour: [你的設定，例如：7pm]
+- Timezone: [你的設定，例如：Asia/Taipei]
+
+我遇到的問題是：
+[描述問題，例如：設定好了但工作流沒有自動執行]
+
+請幫我確認：
+1. 這個設定是否正確
+2. 如果不正確，告訴我怎麼修改
+3. 如何驗證 Schedule 有正常運作

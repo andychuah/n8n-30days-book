@@ -1,0 +1,51 @@
+// Day 25 — Slack 錯誤警報 Block Kit JSON
+// 使用方式：
+// 1. 在 Slack 節點，Message Type 選「Blocks」
+// 2. 切換到 Expression 模式（點欄位右側的 = 符號）
+// 3. 把下方整段貼入 Blocks 欄位
+
+{{
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "🚨 n8n 工作流執行失敗！"
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*工作流名稱：*\n" + $json.workflow.name
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*錯誤訊息：*\n`" + $json.execution.error.message + "`"
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "👉 *點此連結，立刻前往案發現場：*\n<" + $json.execution.url + "|查看詳細執行日誌>"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "🤖 n8n 錯誤監控系統自動發送"
+        }
+      ]
+    }
+  ]
+}
+}}

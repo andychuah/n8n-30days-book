@@ -1,0 +1,14 @@
+// Day 12 — 設計自訂 Slack Block Kit Prompt
+// 用途：需要設計自己格式的 Slack Block Kit 時，貼給 ChatGPT / Claude
+
+我想要設計一個 Slack Block Kit 訊息格式。
+
+我的報告需要包含：
+[列出你想要的內容，例如：
+- 一個標題（Header）
+- 三個部門的數據（每個部門一個 Section，含 2-3 個欄位）
+- 一條分隔線
+- 一段由 n8n 自動產生的 Context 文字]
+
+請幫我生成對應的 Blocks JSON 格式，並解釋每個區塊的作用。
+格式要可以直接貼到 n8n 的 Slack 節點（Expression 模式）。

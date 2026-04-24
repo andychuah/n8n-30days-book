@@ -1,0 +1,15 @@
+// Day 14 — 串接新 API 問題求助 Prompt
+// 用途：想串接一個新 API 但不知道怎麼設定時，貼給 ChatGPT / Claude
+
+我想要用 n8n 的 HTTP Request 節點串接一個 API。
+
+API 資訊：
+- 名稱：[填入 API 名稱]
+- 文件網址：[填入 API 文件的 URL]
+- 我想要取得的資料：[描述你想要什麼資料]
+
+請幫我：
+1. 分析這個 API 需要的 HTTP Method（GET / POST / 其他）
+2. 確認 URL 應該怎麼填
+3. 是否需要認證？如果需要，要怎麼設定？
+4. 回傳的資料格式是什麼？如何用 Expression 取值？

@@ -1,0 +1,50 @@
+{
+  "name": "Day 25 - 錯誤處理機制",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "name": "捕獲錯誤",
+      "parameters": {},
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "2",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "name": "Slack 錯誤警報",
+      "parameters": {
+        "operation": "sendMessage",
+        "channel": "#alerts",
+        "text": "=🚨 *工作流錯誤警報*\n\n工作流：{{ $json.workflow.name }}\n錯誤：{{ $json.execution.error.message }}\n時間：{{ $now.toFormat('yyyy-MM-dd HH:mm') }}"
+      },
+      "position": [
+        450,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "捕獲錯誤": {
+      "main": [
+        [
+          {
+            "node": "Slack 錯誤警報",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "n8n-30days-demo"
+  },
+  "description": "Day 25：錯誤處理 - 任何工作流出錯都即時通知"
+}
