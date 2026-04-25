@@ -1,0 +1,151 @@
+{
+  "name": "Day 22 - Gmail AI 回覆草稿",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [{ "mode": "everyMinute" }]
+        },
+        "filters": {
+          "readStatus": "unread",
+          "labels": []
+        },
+        "options": {
+          "dataPropertyAttachmentsPrefixName": ""
+        }
+      },
+      "id": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [0, 300],
+      "credentials": {
+        "gmailOAuth2": { "id": "YOUR_GMAIL_CREDENTIAL_ID", "name": "Gmail account" }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "你是一位專業且友善的客服人員。\n\n這是一封客戶來信，請你根據信件內容，草擬一封專業的回覆。\n\n請確保回覆：\n1. 感謝客戶的來信\n2. 針對客戶的問題提供清楚的說明\n3. 語氣專業但親切\n\n請以以下格式輸出：\n主旨：Re: [原主旨]\n[回覆草稿]：\n[回覆內容]"
+            },
+            {
+              "role": "user",
+              "content": "=寄件人：{{ $json.from }}\n主旨：{{ $json.subject }}\n內容：{{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c2b3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Message a model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "credentials": {
+        "openAiApi": { "id": "YOUR_OPENAI_CREDENTIAL_ID", "name": "OpenAI account" }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-001",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d3c4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 從 AI 回覆中，提取主旨與草稿內文\nconst rawText = $input.first().json.message.content;\n\n// 提取主旨\nconst subjectMatch = rawText.match(/主旨：(.*)/);\nconst cleanSubject = subjectMatch ? subjectMatch[1].trim() : '（AI 自動生成回覆）';\n\n// 提取草稿內文\nconst draftSplit = rawText.split(/\\[回覆草稿\\]：/);\nlet cleanBody = '';\nif (draftSplit.length > 1) {\n  cleanBody = draftSplit[1].replace(/主旨：.*\\n*/, '').trim();\n} else {\n  cleanBody = rawText;\n}\n\nreturn [{ json: { cleanSubject, cleanBody } }];"
+      },
+      "id": "e4d5f6a7-b8c9-0123-defa-234567890123",
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 240]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "subject": "={{ $json.cleanSubject }}",
+        "message": "={{ $json.cleanBody }}",
+        "toList": ["={{ $('Gmail Trigger').item.json.from }}"],
+        "options": {
+          "threadId": "={{ $('Gmail Trigger').item.json.threadId }}"
+        }
+      },
+      "id": "f5e6a7b8-c9d0-1234-efab-345678901234",
+      "name": "Create a draft",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [960, 240],
+      "credentials": {
+        "gmailOAuth2": { "id": "YOUR_GMAIL_CREDENTIAL_ID", "name": "Gmail account" }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "value": "YOUR_SLACK_CHANNEL_ID", "__rl": true, "mode": "id" },
+        "text": "=📧 已為一封新郵件產生 AI 回覆草稿！\n\n*寄件人：* {{ $('Gmail Trigger').item.json.from }}\n*主旨：* {{ $('Gmail Trigger').item.json.subject }}\n\n請前往 Gmail 草稿夾審核並發送。",
+        "otherOptions": {}
+      },
+      "id": "a6f7b8c9-d0e1-2345-fabc-456789012345",
+      "name": "Send a message",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1200, 240],
+      "credentials": {
+        "slackApi": { "id": "YOUR_SLACK_CREDENTIAL_ID", "name": "Slack account" }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [[{ "node": "Message a model", "type": "main", "index": 0 }]]
+    },
+    "Message a model": {
+      "main": [[{ "node": "If", "type": "main", "index": 0 }]]
+    },
+    "If": {
+      "main": [
+        [{ "node": "Code in JavaScript", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [[{ "node": "Create a draft", "type": "main", "index": 0 }]]
+    },
+    "Create a draft": {
+      "main": [[{ "node": "Send a message", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-04-25T00:00:00.000Z",
+  "versionId": "day22-v1"
+}
