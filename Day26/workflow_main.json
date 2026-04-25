@@ -1,47 +1,214 @@
 {
-  "name": "Day 26 - 主工作流（呼叫子流程）",
+  "name": "n8n_book_day26",
   "nodes": [
     {
-      "id": "1",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1,
-      "name": "每日觸發",
       "parameters": {
         "rule": {
           "interval": [
             {
-              "field": "days",
-              "daysInterval": 1
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 17
             }
           ]
         }
       },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
       "position": [
-        250,
-        300
-      ]
+        0,
+        0
+      ],
+      "id": "1ec58ea4-0552-40bf-8684-1e431045643f",
+      "name": "Schedule Trigger"
     },
     {
-      "id": "2",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "name": "執行：寄送報告",
       "parameters": {
-        "workflowId": "SUB_WORKFLOW_ID_HERE",
-        "waitForSubWorkflow": true
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "本週工作清單"
+            }
+          ]
+        },
+        "options": {}
       },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
       "position": [
-        450,
-        300
-      ]
+        448,
+        0
+      ],
+      "id": "3d90da48-c4ec-4169-9475-6105667eaea6",
+      "name": "整合"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1aV7eWZ_TyeiJjObjZaG_CuGVHJrLYFd5u_3QeNJlT1Y",
+          "mode": "list",
+          "cachedResultName": "工作進度",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aV7eWZ_TyeiJjObjZaG_CuGVHJrLYFd5u_3QeNJlT1Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "2026.04",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aV7eWZ_TyeiJjObjZaG_CuGVHJrLYFd5u_3QeNJlT1Y/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "de346f5e-c657-481f-b88f-56bbfa53fad5",
+      "name": "當周工作清單",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KTikkDBrazHTKovm",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n    try {\n        // 1. 取得 LLM 回傳的原始文字內容\n        // 依照你的資料結構，文字藏在 content.parts[0].text 裡面\n        const rawText = item.json.content.parts[0].text;\n        \n        // 2. 用正規表達式 (Regex) 把 ```json 和 ``` 中間的純 JSON 字串挖出來\n        const jsonMatch = rawText.match(/```json\\s*([\\s\\S]*?)\\s*```/);\n        \n        // 如果有抓到 markdown 格式，就取括號裡面的內容；如果沒有，就直接用原文字\n        let cleanJsonString = rawText;\n        if (jsonMatch && jsonMatch[1]) {\n            cleanJsonString = jsonMatch[1];\n        }\n        \n        // 3. 將乾淨的字串轉換為真正的 JSON 物件\n        const parsedData = JSON.parse(cleanJsonString);\n        \n        // 4. 回傳我們需要的 subject 和 body\n        return {\n            json: {\n                subject: parsedData.subject,\n                body: parsedData.body\n            }\n        };\n        \n    } catch (error) {\n        // 如果解析失敗（例如 AI 沒有按照格式回傳），輸出錯誤訊息方便 Debug\n        return {\n            json: {\n                error: \"解析 JSON 失敗\",\n                details: error.message,\n                rawInput: item.json.content?.parts?.[0]?.text\n            }\n        };\n    }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "c9d04055-5c21-4a53-ad56-490d68db9d17",
+      "name": "解析 AI 內容"
+    },
+    {
+      "parameters": {
+        "sendTo": "andychuah99@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "ececdb91-4413-410d-b2c9-cb42d13f6418",
+      "name": "Send a message",
+      "webhookId": "a8d5cdaf-aa7c-4501-805d-cd213d4d247e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Z65EgkvAEY5Z1Mvq",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "uie9Qey8CXhMHHRu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/uie9Qey8CXhMHHRu",
+          "cachedResultName": "Sub - AI 文字處理器"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "prompt": "=【指令】：請幫我草擬一份當週工作進度報告的 Email。請務必嚴格以 JSON 格式輸出，必須包含 \"subject\" 和 \"body\" 兩個 Key，不要輸出任何其他 Markdown 文字。\n【內容】：{{ $json['本週工作清單'].join() }}"
+          },
+          "matchingColumns": [
+            "prompt"
+          ],
+          "schema": [
+            {
+              "id": "prompt",
+              "displayName": "prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "60184a76-6dbe-4d5b-b6df-93078b08dc7d",
+      "name": "Call 'Sub - AI 文字處理器'"
     }
   ],
+  "pinData": {},
   "connections": {
-    "每日觸發": {
+    "Schedule Trigger": {
       "main": [
         [
           {
-            "node": "執行：寄送報告",
+            "node": "當周工作清單",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "當周工作清單": {
+      "main": [
+        [
+          {
+            "node": "整合",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "整合": {
+      "main": [
+        [
+          {
+            "node": "Call 'Sub - AI 文字處理器'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "解析 AI 內容": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Sub - AI 文字處理器'": {
+      "main": [
+        [
+          {
+            "node": "解析 AI 內容",
             "type": "main",
             "index": 0
           }
@@ -50,9 +217,15 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 26：主工作流 - 呼叫子流程模組"
+  "versionId": "c750481d-0127-49b2-aff5-62d53ad93780",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "kNq2wcriDyZ2JDCH",
+  "tags": []
 }

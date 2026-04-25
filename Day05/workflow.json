@@ -1,101 +1,114 @@
 {
-  "name": "Day 5 - RSS + Filter + Email 通知",
+  "name": "n8n_book_day5",
   "nodes": [
     {
-      "id": "1",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "name": "手動觸發",
-      "parameters": {},
-      "position": [
-        250,
-        300
-      ]
-    },
-    {
-      "id": "2",
-      "type": "n8n-nodes-base.rssFeedRead",
-      "typeVersion": 1,
-      "name": "RSS 讀取",
       "parameters": {
-        "url": "https://example.com/feed.xml"
+        "fromEmail": "andychuah99@gmail.com",
+        "toEmail": "andychuah99@gmail.com",
+        "subject": "今天的內容創作很精彩，趕快來看看！",
+        "emailFormat": "text",
+        "text": "={{ $json.body }}",
+        "options": {}
       },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [
-        450,
-        300
-      ]
+        464,
+        -80
+      ],
+      "id": "c75090a6-4163-479e-a777-e689cb0149de",
+      "name": "Send email (With update)",
+      "webhookId": "fb22de40-7354-4c33-80da-01dafe232cef"
     },
     {
-      "id": "3",
-      "type": "n8n-nodes-base.filter",
-      "typeVersion": 1,
-      "name": "過濾新文章",
+      "parameters": {
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        -80
+      ],
+      "id": "ca88f713-9cb1-4226-b701-25f7b313734f",
+      "name": "RSS Read (YT)"
+    },
+    {
       "parameters": {
         "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
           "conditions": [
             {
-              "id": "1",
+              "id": "fe295a97-2186-4f28-bc72-85521e1e5412",
               "leftValue": "={{ $json.pubDate }}",
-              "rightValue": "={{ $now.minus(1, 'day').toISO() }}",
+              "rightValue": "={{ DateTime.now().startOf('day') }}",
               "operator": {
                 "type": "dateTime",
                 "operation": "after"
               }
             }
-          ]
-        }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
       "position": [
-        650,
-        300
-      ]
+        240,
+        -80
+      ],
+      "id": "c8d1f694-cee7-4412-941f-35fbe688b6ae",
+      "name": "篩選出今天更新的作品",
+      "alwaysOutputData": true
     },
     {
-      "id": "4",
-      "type": "n8n-nodes-base.emailSend",
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "name": "寄送 Email",
-      "parameters": {
-        "fromEmail": "your@email.com",
-        "toEmail": "recipient@email.com",
-        "subject": "=新文章：{{ $json.title }}",
-        "emailType": "html",
-        "message": "=<h2>{{ $json.title }}</h2><p>{{ $json.content }}</p><a href='{{ $json.link }}'>閱讀全文</a>"
-      },
       "position": [
-        850,
-        300
-      ]
+        -208,
+        -80
+      ],
+      "id": "96cd104d-beea-449e-901f-5279ebad79f3",
+      "name": "When clicking ‘Execute workflow’"
     }
   ],
+  "pinData": {},
   "connections": {
-    "手動觸發": {
+    "RSS Read (YT)": {
       "main": [
         [
           {
-            "node": "RSS 讀取",
+            "node": "篩選出今天更新的作品",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "RSS 讀取": {
+    "篩選出今天更新的作品": {
       "main": [
         [
           {
-            "node": "過濾新文章",
+            "node": "Send email (With update)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "過濾新文章": {
+    "When clicking ‘Execute workflow’": {
       "main": [
         [
           {
-            "node": "寄送 Email",
+            "node": "RSS Read (YT)",
             "type": "main",
             "index": 0
           }
@@ -104,9 +117,14 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 5：RSS + Filter + Email 自動通知新文章"
+  "versionId": "9fd7af7f-2c3e-4e06-b897-46d9f965e86f",
+  "meta": {
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "lG8VchHdxBtZB1T1",
+  "tags": []
 }

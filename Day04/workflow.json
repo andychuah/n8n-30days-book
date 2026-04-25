@@ -2,32 +2,34 @@
   "name": "Day 4 - RSS 訂閱監測",
   "nodes": [
     {
-      "id": "1",
+      "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "name": "手動觸發",
-      "parameters": {},
       "position": [
-        250,
-        300
-      ]
+        0,
+        -48
+      ],
+      "id": "25c3d841-6a6e-4520-860b-9fd90364e75f",
+      "name": "When clicking ‘Execute workflow’"
     },
     {
-      "id": "2",
+      "parameters": {
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA",
+        "options": {}
+      },
+      "id": "c5968ed4-f5cc-4ed7-827f-bd595e66539c",
       "type": "n8n-nodes-base.rssFeedRead",
       "typeVersion": 1,
       "name": "RSS 讀取",
-      "parameters": {
-        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCxxxxxxxxxxxxxxxxxx"
-      },
       "position": [
-        450,
-        300
+        224,
+        -48
       ]
     }
   ],
+  "pinData": {},
   "connections": {
-    "手動觸發": {
+    "When clicking ‘Execute workflow’": {
       "main": [
         [
           {
@@ -40,9 +42,14 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 4：用 RSS 節點監測 YouTube 頻道更新"
+  "versionId": "a0c9a183-abd6-4e32-a896-c3e63240f14b",
+  "meta": {
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "JjqoAUOF26AlHSad",
+  "tags": []
 }

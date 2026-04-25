@@ -2,53 +2,133 @@
   "name": "Day 17 - AI Agent 工作流",
   "nodes": [
     {
-      "id": "1",
+      "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "name": "手動觸發",
-      "parameters": {},
       "position": [
-        250,
-        300
-      ]
+        0,
+        32
+      ],
+      "id": "1aaa3f97-c438-4662-8946-e11ea0efbfa8",
+      "name": "When clicking ‘Execute workflow’"
     },
     {
-      "id": "2",
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 1,
-      "name": "AI Agent",
       "parameters": {
-        "text": "=你是一個專業的文章摘要助理。請幫我摘要以下文章：\n{{ $json.content }}",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b81a3c3c-546d-436e-8540-3c4d84cfbdfe",
+              "name": "：chatInput",
+              "value": "你好，我想請問一下，如果我在你們網站上買的商品不滿意，退貨的流程是什麼？謝謝",
+              "type": "string"
+            }
+          ]
+        },
         "options": {}
       },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        450,
-        300
-      ]
+        224,
+        32
+      ],
+      "id": "bfc3d5a6-d3af-43a4-b3ec-ac4fadeed574",
+      "name": "Edit Fields"
     },
     {
-      "id": "3",
-      "type": "@n8n/n8n-nodes-langchain.lmOpenAi",
-      "typeVersion": 1,
-      "name": "OpenAI GPT-4",
       "parameters": {
-        "model": "gpt-4o-mini",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $json['：chatInput'] }}"
+            }
+          ]
+        },
+        "builtInTools": {},
         "options": {
-          "temperature": 0.7
+          "instructions": "你是一位專業且友善的客服人員。\n\n這是一封客戶來信，請你根據信件內容，參考以下公司政策，草擬一封專業的回覆：\n\n公司退貨政策：\n- 商品可在購買後 7 天內無條件退貨\n- 退貨商品須保持原包裝完整\n- 退款將在收到退貨後 3-5 個工作天內處理\n\n請確保回覆：\n1. 感謝客戶的來信\n2. 清楚說明退貨流程\n3. 語氣專業但親切\n"
         }
       },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
       "position": [
-        250,
-        500
-      ]
+        448,
+        128
+      ],
+      "id": "0a28e62e-0cc4-4a29-8aaa-1cd640dca337",
+      "name": "Message a model (ChatGPT)",
+      "credentials": {
+        "openAiApi": {
+          "id": "5DLSFzvquTjgHFSC",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json['：chatInput'] }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "你是一位專業且友善的客服人員。  這是一封客戶來信，請你根據信件內容，參考以下公司政策，草擬一封專業的回覆：  公司退貨政策： - 商品可在購買後 7 天內無條件退貨 - 退貨商品須保持原包裝完整 - 退款將在收到退貨後 3-5 個工作天內處理  請確保回覆： 1. 感謝客戶的來信 2. 清楚說明退貨流程 3. 語氣專業但親切"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        -64
+      ],
+      "id": "44292da5-5c4c-43ef-af85-28fd3b63e627",
+      "name": "Message a model (Gemini)",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2UQWMg6VZejfU8DU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
     }
   ],
+  "pinData": {},
   "connections": {
-    "手動觸發": {
+    "When clicking ‘Execute workflow’": {
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Message a model (Gemini)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Message a model (ChatGPT)",
             "type": "main",
             "index": 0
           }
@@ -57,9 +137,15 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 17：AI Agent 節點 - 讓 n8n 擁有 AI 思考能力"
+  "versionId": "6fad032c-c54a-41dc-8bb5-a205d726740a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "KAjwaHYifV4KWWyx",
+  "tags": []
 }

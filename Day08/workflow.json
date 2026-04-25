@@ -1,151 +1,281 @@
 {
-  "name": "Day 8 - Merge 多來源 RSS",
+  "name": "n8n book day 8",
   "nodes": [
     {
-      "id": "1",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1,
-      "name": "每日觸發",
       "parameters": {
         "rule": {
           "interval": [
             {
-              "field": "days",
-              "daysInterval": 1
+              "triggerAtHour": 19
             }
           ]
         }
       },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
       "position": [
-        250,
-        300
-      ]
+        352,
+        144
+      ],
+      "id": "5fbd5a12-a0c9-4038-bf18-a79c491234c8",
+      "name": "Schedule Trigger"
     },
     {
-      "id": "2",
-      "type": "n8n-nodes-base.rssFeedRead",
-      "typeVersion": 1,
-      "name": "RSS 來源一",
       "parameters": {
-        "url": "https://source1.com/feed.xml"
+        "fromEmail": "andychuah99@gmail.com",
+        "toEmail": "andychuah99@gmail.com",
+        "subject": "你追蹤的頻道今天沒有更新喔！n8n 仍在正常運作中",
+        "emailFormat": "text",
+        "text": "={{ $json.body }}",
+        "options": {}
       },
-      "position": [
-        450,
-        200
-      ]
-    },
-    {
-      "id": "3",
-      "type": "n8n-nodes-base.rssFeedRead",
-      "typeVersion": 1,
-      "name": "RSS 來源二",
-      "parameters": {
-        "url": "https://source2.com/feed.xml"
-      },
-      "position": [
-        450,
-        400
-      ]
-    },
-    {
-      "id": "4",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 1,
-      "name": "合併所有來源",
-      "parameters": {
-        "mode": "append"
-      },
-      "position": [
-        650,
-        300
-      ]
-    },
-    {
-      "id": "5",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 1,
-      "name": "整理彙整訊息",
-      "parameters": {
-        "jsCode": "const items = $input.all();\nlet body = '📢 今日更新彙整：\\n\\n';\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i].json;\n  body += `${i+1}. ${item.title}\\n   🔗 ${item.link}\\n`;\n}\nbody += '\\n---\\n由 n8n 自動整理發送';\nreturn [{ json: { body } }];"
-      },
-      "position": [
-        850,
-        300
-      ]
-    },
-    {
-      "id": "6",
       "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 1,
-      "name": "寄送彙整報告",
-      "parameters": {
-        "fromEmail": "your@email.com",
-        "toEmail": "you@email.com",
-        "subject": "📰 今日創作者更新彙整"
-      },
+      "typeVersion": 2.1,
       "position": [
-        1050,
-        300
-      ]
+        1472,
+        240
+      ],
+      "id": "ca4be77e-002b-4230-a6f0-a9d799aca2b5",
+      "name": "Send email (Without new update)",
+      "webhookId": "fb22de40-7354-4c33-80da-01dafe232cef",
+      "credentials": {
+        "smtp": {
+          "id": "Q0ozYsgYzipVs72a",
+          "name": "SMTP account (Andy Test)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get all input items\nconst items = $input.all();\n\n// 2. If no data, return early\nif (items.length === 0) {\n  return [{ json: { body: '今天沒有新的更新。' } }];\n}\n\n// 3. Aggregate items into a single string\nlet body = '📢 今日更新彙整：\\n\\n';\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i].json;\n  \n  // Using backticks (`) for clean multiline template literals\n  body += `${i + 1}. ${item.title}\\n`;\n  body += `🔗 ${item.link}\\n`;\n  \n  if (item.author) {\n    body += `👤 ${item.author}\\n`;\n  }\n  \n  body += '\\n'; // Add space between items\n}\n\nbody += '---\\n由 n8n 自動整理發送';\n\n// 4. Return the aggregated data as a single item\nreturn [{ json: { body: body } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        48
+      ],
+      "id": "5f5a59c2-fc63-4f83-8725-d21fed5d6a52",
+      "name": "彙整資料"
+    },
+    {
+      "parameters": {
+        "fromEmail": "andychuah99@gmail.com",
+        "toEmail": "andychuah99@gmail.com",
+        "subject": "今天的內容創作很精彩，趕快來看看！",
+        "emailFormat": "text",
+        "text": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1696,
+        48
+      ],
+      "id": "0b3b41e5-c1ce-4fad-9563-d2199fac51e7",
+      "name": "Send email (With update)",
+      "webhookId": "fb22de40-7354-4c33-80da-01dafe232cef",
+      "credentials": {
+        "smtp": {
+          "id": "Q0ozYsgYzipVs72a",
+          "name": "SMTP account (Andy Test)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5934dba-1f01-4f55-98f3-f805410e96f4",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1248,
+        144
+      ],
+      "id": "bc10af9f-a98d-4cac-b37c-7f3fda101f95",
+      "name": "檢查是否有更新"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fe295a97-2186-4f28-bc72-85521e1e5412",
+              "leftValue": "={{ $json.pubDate }}",
+              "rightValue": "={{ DateTime.now().startOf('day').minus(7, 'days') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        144
+      ],
+      "id": "6cc60674-cbf6-4798-9cca-873833dd8226",
+      "name": "篩選出7天內更新的作品",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        48
+      ],
+      "id": "cd50128a-8f5c-4739-a408-047fe5851066",
+      "name": "RSS Read (YT)"
+    },
+    {
+      "parameters": {
+        "url": "https://techcrunch.com/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        240
+      ],
+      "id": "dddc7547-4efb-4812-a45b-b0221695bc4b",
+      "name": "RSS Read (Techcrunch)"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        800,
+        144
+      ],
+      "id": "f68fb260-dd49-4e6a-8796-7292f71b1729",
+      "name": "Merge"
     }
   ],
+  "pinData": {},
   "connections": {
-    "每日觸發": {
+    "Schedule Trigger": {
       "main": [
         [
           {
-            "node": "RSS 來源一",
+            "node": "RSS Read (YT)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read (Techcrunch)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "彙整資料": {
+      "main": [
+        [
+          {
+            "node": "Send email (With update)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "檢查是否有更新": {
+      "main": [
+        [
+          {
+            "node": "彙整資料",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "RSS 來源二",
+            "node": "Send email (Without new update)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "RSS 來源一": {
+    "篩選出7天內更新的作品": {
       "main": [
         [
           {
-            "node": "合併所有來源",
+            "node": "檢查是否有更新",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "RSS 來源二": {
+    "RSS Read (YT)": {
       "main": [
         [
           {
-            "node": "合併所有來源",
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read (Techcrunch)": {
+      "main": [
+        [
+          {
+            "node": "Merge",
             "type": "main",
             "index": 1
           }
         ]
       ]
     },
-    "合併所有來源": {
+    "Merge": {
       "main": [
         [
           {
-            "node": "整理彙整訊息",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "整理彙整訊息": {
-      "main": [
-        [
-          {
-            "node": "寄送彙整報告",
+            "node": "篩選出7天內更新的作品",
             "type": "main",
             "index": 0
           }
@@ -154,9 +284,14 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1"
   },
-  "description": "Day 8：Merge 節點 - 同時監測多個創作者"
+  "versionId": "635f2b66-a8a0-4308-b9e5-0402b8f72b9c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ef3122076c469c01017b1f3c655e97b17f6d96d976a171f896f3767e25e508b6"
+  },
+  "id": "AC6KL107RsgTtDhe",
+  "tags": []
 }

@@ -1,47 +1,48 @@
 {
-  "name": "Day 3 - 第一個 n8n 工作流",
+  "name": "n8n_book_day3",
   "nodes": [
     {
-      "id": "1",
+      "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "name": "手動觸發",
-      "parameters": {},
       "position": [
-        250,
-        300
-      ]
+        0,
+        0
+      ],
+      "id": "25c3d841-6a6e-4520-860b-9fd90364e75f",
+      "name": "When clicking ‘Execute workflow’"
     },
     {
-      "id": "2",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 1,
-      "name": "設定訊息",
       "parameters": {
         "assignments": {
           "assignments": [
             {
-              "id": "1",
+              "id": "1d6277a4-b279-4e79-b2e0-8d18420d48f5",
               "name": "message",
-              "value": "Hello from n8n! 你的第一個自動化成功了 🎉",
+              "value": "Hello World",
               "type": "string"
             }
           ]
         },
         "options": {}
       },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        450,
-        300
-      ]
+        208,
+        0
+      ],
+      "id": "3865b391-e250-4305-bd4b-3a781f2214e8",
+      "name": "Edit Fields"
     }
   ],
+  "pinData": {},
   "connections": {
-    "手動觸發": {
+    "When clicking ‘Execute workflow’": {
       "main": [
         [
           {
-            "node": "設定訊息",
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
@@ -50,9 +51,14 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 3：你的第一個 n8n 工作流 - 用 Set 節點設定一個訊息"
+  "versionId": "db90c3ed-630c-450e-b543-372ab0c8ac47",
+  "meta": {
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "JjqoAUOF26AlHSad",
+  "tags": []
 }

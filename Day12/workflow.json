@@ -15,10 +15,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        0,
-        416
+        -80,
+        144
       ],
-      "id": "164c88e9-e0b2-4aa6-9985-ba798a01feec",
+      "id": "a5ed9ec7-7684-406d-ac8d-4d430804432b",
       "name": "Schedule Trigger"
     },
     {
@@ -42,29 +42,23 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        224,
-        224
+        144,
+        -48
       ],
-      "id": "fa1437ee-cb3a-4330-90aa-e9007486a443",
-      "name": "Get 行銷資料",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "RvEhqT3NH9YRz8oY",
-          "name": "Andy Google Sheet"
-        }
-      }
+      "id": "be2b96e8-1ee1-4ac8-bbfe-edfc92e6ca80",
+      "name": "Get 行銷資料"
     },
     {
       "parameters": {
-        "jsCode": "// 取得所有輸入的資料\nconst items = $input.all();\n\n// 找出資料中最新的日期（以毫秒為單位）\nlet latestTimestamp = 0;\nitems.forEach(item => {\n  const ts = new Date(item.json['Timestamp']).getTime();\n  if (ts > latestTimestamp) latestTimestamp = ts;\n});\n\n// 將最新日期格式化為台灣時間字串\nconst latestDateStr = new Date(latestTimestamp).toLocaleDateString('zh-TW', {\n  timeZone: 'Asia/Taipei',\n  year: 'numeric', \n  month: 'long', \n  day: 'numeric'\n});\n\n// 篩選出「最新一週」的所有部門資料\nconst latestEntries = items.filter(item => {\n  const ts = new Date(item.json['Timestamp']).getTime();\n  return ts === latestTimestamp;\n});\n\n// 分別抓取各部門的最新資料（若無資料則給予空物件以防報錯）\nconst mktData = latestEntries.find(e => e.json['部門'] === '行銷')?.json || {};\nconst salesData = latestEntries.find(e => e.json['部門'] === '業務')?.json || {};\nconst csData = latestEntries.find(e => e.json['部門'] === '客服')?.json || {};\n\n// 撰寫各部門總結報告\nconst report = `\n📊 各部門最新週報彙整\n━━━━━━━━━━━━━━━━━━━━━━\n📅 結算日期：${latestDateStr}\n\n📢 【行銷部】\n• 本週發文數：${mktData['本週發文數'] || 0} 篇\n• 觸及率：${mktData['觸及率(%)'] || 0}%\n• 新增粉絲：${mktData['新增粉絲數'] || 0} 人\n📝 備註：${mktData['備註'] || '無'}\n\n💼 【業務部】\n• 新增客戶：${salesData['本週新增客戶數'] || 0} 家\n• 成交金額：$${Number(salesData['成交金額(元)'] || 0).toLocaleString('zh-TW')} 元\n• 拜訪次數：${salesData['拜訪次數'] || 0} 次\n📝 備註：${salesData['備註'] || '無'}\n\n🎧 【客服部】\n• 處理件數：${csData['本週處理件數'] || 0} 件\n• 平均回應：${csData['平均回應時間(小時)'] || 0} 小時\n• 客戶滿意度：${csData['客戶滿意度(%)'] || 0}%\n📝 備註：${csData['備註'] || '無'}\n\n━━━━━━━━━━━━━━━━━━━━━━\n🤖 由 n8n 自動產生\n`.replace(/^\\s+/gm, ''); // 移除多餘縮排，確保靠左對齊\n\n// 回傳報告\nreturn [{ json: { report: report } }];"
+        "jsCode": "const items = $input.all();\n\n// 找出最新日期\nlet latestTimestamp = 0;\nitems.forEach(item => {\n  const ts = new Date(item.json['Timestamp']).getTime();\n  if (ts > latestTimestamp) latestTimestamp = ts;\n});\n\nconst latestDateStr = new Date(latestTimestamp).toLocaleDateString('zh-TW', {\n  timeZone: 'Asia/Taipei', year: 'numeric', month: 'long', day: 'numeric'\n});\n\n// 篩選出最新一週資料\nconst latestEntries = items.filter(item => new Date(item.json['Timestamp']).getTime() === latestTimestamp);\n\n// 直接輸出 JSON 物件，不要包成字串\nreturn [{\n  json: {\n    date: latestDateStr,\n    mkt: latestEntries.find(e => e.json['部門'] === '行銷')?.json || {},\n    sales: latestEntries.find(e => e.json['部門'] === '業務')?.json || {},\n    cs: latestEntries.find(e => e.json['部門'] === '客服')?.json || {}\n  }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        672,
-        416
+        592,
+        144
       ],
-      "id": "dc46a653-2d38-4446-9146-3d4ced884c68",
+      "id": "50627776-6adc-4b32-a139-7ac68f076693",
       "name": "Code in JavaScript"
     },
     {
@@ -88,17 +82,11 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        224,
-        416
+        144,
+        144
       ],
-      "id": "390baa37-3fca-46fe-b9ea-c22fcc4e75a5",
-      "name": "Get 業務資料",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "RvEhqT3NH9YRz8oY",
-          "name": "Andy Google Sheet"
-        }
-      }
+      "id": "5a291fd2-883c-4f93-ac03-e4195798bd21",
+      "name": "Get 業務資料"
     },
     {
       "parameters": {
@@ -121,17 +109,11 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        224,
-        608
+        144,
+        336
       ],
-      "id": "1de2a506-160b-4f85-a8f8-9aecb33245ad",
-      "name": "Get 客服資料",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "RvEhqT3NH9YRz8oY",
-          "name": "Andy Google Sheet"
-        }
-      }
+      "id": "c0357da2-c8bd-43d2-bdc7-789cb31f1deb",
+      "name": "Get 客服資料"
     },
     {
       "parameters": {
@@ -140,10 +122,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        448,
-        400
+        368,
+        128
       ],
-      "id": "fbfe8d2d-bdc6-4c12-ab93-799537901206",
+      "id": "dc09fcbf-18a5-4f15-af58-9c7fe3a9ceab",
       "name": "Merge"
     },
     {
@@ -154,22 +136,24 @@
           "value": "@andy.chuah",
           "mode": "username"
         },
+        "messageType": "block",
+        "blocksUi": "=// Day 12 — Slack Block Kit JSON（Step 2/2）\n// 使用方式：\n// 1. 在 Slack 節點，Message Type 選「Blocks」\n// 2. 切換到 Expression 模式（點擊欄位右側的 = 符號）\n// 3. 把下方「{{」到「}}」整段（含兩端的雙大括號）貼入 Blocks 欄位\n// 前置：需配合 code.js 的 Code 節點輸出\n\n{{\n{\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": { \"type\": \"plain_text\", \"text\": \"📊 各部門最新週報彙整\", \"emoji\": true }\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [\n        { \"type\": \"mrkdwn\", \"text\": \"📅 *結算日期：* \" + $json.date }\n      ]\n    },\n    { \"type\": \"divider\" },\n    {\n      \"type\": \"section\",\n      \"text\": { \"type\": \"mrkdwn\", \"text\": \"📢 *【行銷部】*\" },\n      \"fields\": [\n        { \"type\": \"mrkdwn\", \"text\": \"• *本週發文：* \" + ($json.mkt[\"本週發文數\"] || 0) + \" 篇\" },\n        { \"type\": \"mrkdwn\", \"text\": \"• *觸及率：* \" + ($json.mkt[\"觸及率(%)\"] || 0) + \"%\" },\n        { \"type\": \"mrkdwn\", \"text\": \"• *新增粉絲：* \" + ($json.mkt[\"新增粉絲數\"] || 0) + \" 人\" }\n      ]\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"📝 *備註：* \" + ($json.mkt[\"備註\"] || \"無\") }]\n    },\n    { \"type\": \"divider\" },\n    {\n      \"type\": \"section\",\n      \"text\": { \"type\": \"mrkdwn\", \"text\": \"💼 *【業務部】*\" },\n      \"fields\": [\n        { \"type\": \"mrkdwn\", \"text\": \"• *新增客戶：* \" + ($json.sales[\"本週新增客戶數\"] || 0) + \" 家\" },\n        { \"type\": \"mrkdwn\", \"text\": \"• *成交金額：* $\" + Number($json.sales[\"成交金額(元)\"] || 0).toLocaleString() },\n        { \"type\": \"mrkdwn\", \"text\": \"• *拜訪次數：* \" + ($json.sales[\"拜訪次數\"] || 0) + \" 次\" }\n      ]\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"📝 *備註：* \" + ($json.sales[\"備註\"] || \"無\") }]\n    },\n    { \"type\": \"divider\" },\n    {\n      \"type\": \"section\",\n      \"text\": { \"type\": \"mrkdwn\", \"text\": \"🎧 *【客服部】*\" },\n      \"fields\": [\n        { \"type\": \"mrkdwn\", \"text\": \"• *處理件數：* \" + ($json.cs[\"本週處理件數\"] || 0) + \" 件\" },\n        { \"type\": \"mrkdwn\", \"text\": \"• *平均回應：* \" + ($json.cs[\"平均回應時間(小時)\"] || 0) + \" 小時\" },\n        { \"type\": \"mrkdwn\", \"text\": \"• *客戶滿意度：* \" + ($json.cs[\"客戶滿意度(%)\"] || 0) + \"%\" }\n      ]\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"📝 *備註：* \" + ($json.cs[\"備註\"] || \"無\") }]\n    },\n    { \"type\": \"divider\" },\n    {\n      \"type\": \"context\",\n      \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"🤖 由 *n8n* 自動解析並產生\" }]\n    }\n  ]\n}\n}}",
         "text": "={{ $json.report }}",
         "otherOptions": {}
       },
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.4,
       "position": [
-        896,
-        416
+        816,
+        144
       ],
-      "id": "af98aa85-7b5e-4a5f-8620-7e13c0a8db90",
+      "id": "26ef056a-c91d-43fd-8170-635e336701ff",
       "name": "Send a message",
       "webhookId": "b60dabc3-4100-46d9-a3e5-11ac2b0187e2",
       "credentials": {
         "slackApi": {
-          "id": "HMEEXxYFRSpC95lj",
-          "name": "Slack account 440"
+          "id": "8QwjAIhSXjtx1mny",
+          "name": "Slack account"
         }
       }
     }
@@ -255,13 +239,13 @@
   },
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "versionId": "19920032-e6ba-4978-ba53-7764432e6aea",
+  "versionId": "d5e472b1-0d18-47f1-8abc-16cf0a98da8f",
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "ef3122076c469c01017b1f3c655e97b17f6d96d976a171f896f3767e25e508b6"
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
   },
-  "id": "loVqSqSXiT9St5j6",
+  "id": "J4PAQBzLmG5mlCEI",
   "tags": []
 }

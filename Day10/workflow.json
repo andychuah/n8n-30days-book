@@ -2,60 +2,73 @@
   "name": "Day 10 - Google Sheets 中央資料庫",
   "nodes": [
     {
-      "id": "1",
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "id": "ef761454-1833-4ea1-be89-ac2195cb84bd",
       "type": "n8n-nodes-base.googleSheetsTrigger",
       "typeVersion": 1,
       "name": "Google Sheets 新資料觸發",
-      "parameters": {
-        "sheetId": "YOUR_SHEET_ID",
-        "event": "rowAdded"
-      },
       "position": [
-        250,
-        300
+        -16,
+        -96
       ]
     },
     {
-      "id": "2",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 1,
-      "name": "整理資料格式",
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "1",
-              "name": "name",
-              "value": "={{ $json.姓名 }}",
-              "type": "string"
-            },
-            {
-              "id": "2",
-              "name": "email",
-              "value": "={{ $json.Email }}",
-              "type": "string"
-            },
-            {
-              "id": "3",
-              "name": "timestamp",
-              "value": "={{ $now.toISO() }}",
-              "type": "string"
-            }
-          ]
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
         }
       },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
       "position": [
-        450,
-        300
-      ]
+        192,
+        -96
+      ],
+      "id": "7a48c67f-1660-4734-9bc6-f52ab30faf2b",
+      "name": "把資料寫進中央 Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KTikkDBrazHTKovm",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
     }
   ],
+  "pinData": {},
   "connections": {
     "Google Sheets 新資料觸發": {
       "main": [
         [
           {
-            "node": "整理資料格式",
+            "node": "把資料寫進中央 Sheets",
             "type": "main",
             "index": 0
           }
@@ -64,9 +77,14 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 10：Google Sheets 觸發 - 有人填表就自動執行"
+  "versionId": "64509dac-7390-465a-833d-87d1f2da2fcc",
+  "meta": {
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "fTpAjjqPfmSsQNJ1",
+  "tags": []
 }

@@ -2,76 +2,120 @@
   "name": "Day 19 - Webhook 接收即時指令",
   "nodes": [
     {
-      "id": "1",
+      "parameters": {
+        "path": "6de577ce-0b7a-41a5-aad8-69943cefd781",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "578b27d7-fd57-4e1d-8cdc-f224b06cdec4",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "name": "接收 Webhook",
-      "parameters": {
-        "path": "my-webhook",
-        "responseMode": "responseNode",
-        "httpMethod": "POST"
-      },
       "position": [
-        250,
-        300
-      ]
+        368,
+        -80
+      ],
+      "webhookId": "6de577ce-0b7a-41a5-aad8-69943cefd781"
     },
     {
-      "id": "2",
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 1,
-      "name": "AI 處理指令",
       "parameters": {
-        "text": "=處理這個指令：{{ $json.body.command }}"
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ac5f2912-6591-4701-8073-462fa4c32a74",
+              "name": "chatInput",
+              "value": "={{ $json.query.topic }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
       },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        450,
-        300
-      ]
+        576,
+        -80
+      ],
+      "id": "12988c3a-3761-4874-a73f-7d9331107a77",
+      "name": "Edit Fields"
     },
     {
-      "id": "3",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "name": "回傳結果",
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ { success: true, result: $json.output } }}"
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.chatInput }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "請你扮演一位專業的科技分析師。  根據我提供的以下主題，為我寫一份大約 200 字的重點摘要。  請確保： 1. 使用專業但易懂的語言 2. 列出 3-5 個重點 3. 使用繁體中文"
+        }
       },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
       "position": [
-        650,
-        300
-      ]
+        784,
+        -80
+      ],
+      "id": "ccd5606a-5d57-43ce-b9a6-847fc8a32102",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2UQWMg6VZejfU8DU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
     }
   ],
+  "pinData": {},
   "connections": {
     "接收 Webhook": {
       "main": [
         [
           {
-            "node": "AI 處理指令",
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "AI 處理指令": {
+    "Edit Fields": {
       "main": [
         [
           {
-            "node": "回傳結果",
+            "node": "Message a model",
             "type": "main",
             "index": 0
           }
         ]
       ]
+    },
+    "Message a model": {
+      "main": [
+        []
+      ]
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 19：Webhook 節點 - 接收外部即時指令"
+  "versionId": "cf06319c-2078-4823-9404-23915ac62f31",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "F1uRG9u0BqcSoBwe",
+  "tags": []
 }

@@ -1,109 +1,122 @@
 {
-  "name": "Day 6 - 定時 RSS 監測（排程版）",
+  "name": "Day 6",
   "nodes": [
     {
-      "id": "1",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1,
-      "name": "每天早上 8 點",
       "parameters": {
         "rule": {
           "interval": [
             {
-              "field": "hours",
-              "hoursInterval": 24
+              "triggerAtHour": 19
             }
           ]
-        },
-        "triggerAtHour": 8
+        }
       },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
       "position": [
-        250,
-        300
-      ]
+        -480,
+        432
+      ],
+      "id": "9743613a-897e-49e2-8055-40053d2855d8",
+      "name": "Schedule Trigger1"
     },
     {
-      "id": "2",
-      "type": "n8n-nodes-base.rssFeedRead",
-      "typeVersion": 1,
-      "name": "RSS 讀取",
       "parameters": {
-        "url": "https://example.com/feed.xml"
+        "fromEmail": "andychuah99@gmail.com",
+        "toEmail": "andychuah99@gmail.com",
+        "subject": "今天的內容創作很精彩，趕快來看看！",
+        "emailFormat": "text",
+        "text": "={{ $json.body }}",
+        "options": {}
       },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [
-        450,
-        300
-      ]
+        192,
+        432
+      ],
+      "id": "19314ae6-0326-42a5-bff3-e0dee928f1ab",
+      "name": "Send email (With update)1",
+      "webhookId": "fb22de40-7354-4c33-80da-01dafe232cef"
     },
     {
-      "id": "3",
-      "type": "n8n-nodes-base.filter",
-      "typeVersion": 1,
-      "name": "過濾今日文章",
       "parameters": {
         "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
           "conditions": [
             {
-              "id": "1",
+              "id": "fe295a97-2186-4f28-bc72-85521e1e5412",
               "leftValue": "={{ $json.pubDate }}",
-              "rightValue": "={{ $now.minus(1, 'day').toISO() }}",
+              "rightValue": "={{ DateTime.now().startOf('day').minus(7, 'days') }}",
               "operator": {
                 "type": "dateTime",
                 "operation": "after"
               }
             }
-          ]
-        }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
       "position": [
-        650,
-        300
-      ]
+        -32,
+        432
+      ],
+      "id": "fa27ced6-d235-4a26-b5b9-a23f734cf2b0",
+      "name": "篩選出7天內更新的作品1",
+      "alwaysOutputData": true
     },
     {
-      "id": "4",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 1,
-      "name": "寄送 Email",
       "parameters": {
-        "fromEmail": "your@email.com",
-        "toEmail": "recipient@email.com",
-        "subject": "=📰 今日新文章：{{ $json.title }}"
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA",
+        "options": {}
       },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
       "position": [
-        850,
-        300
-      ]
+        -256,
+        432
+      ],
+      "id": "eae91d5e-d194-4cfd-9f7d-2a4e98e582f3",
+      "name": "RSS Read (YT)1"
     }
   ],
+  "pinData": {},
   "connections": {
-    "每天早上 8 點": {
+    "Schedule Trigger1": {
       "main": [
         [
           {
-            "node": "RSS 讀取",
+            "node": "RSS Read (YT)1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "RSS 讀取": {
+    "篩選出7天內更新的作品1": {
       "main": [
         [
           {
-            "node": "過濾今日文章",
+            "node": "Send email (With update)1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "過濾今日文章": {
+    "RSS Read (YT)1": {
       "main": [
         [
           {
-            "node": "寄送 Email",
+            "node": "篩選出7天內更新的作品1",
             "type": "main",
             "index": 0
           }
@@ -112,9 +125,14 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 6：排程觸發 - 每天自動執行 RSS 監測"
+  "versionId": "229f6596-8ba6-4b6f-923a-8c43469d81e8",
+  "meta": {
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "vzywxTnugMWp8dAB",
+  "tags": []
 }

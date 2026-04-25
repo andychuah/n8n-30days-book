@@ -1,130 +1,217 @@
 {
-  "name": "Day 7 - IF 節點智慧判斷",
+  "name": "Day 7",
   "nodes": [
     {
-      "id": "1",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1,
-      "name": "每日觸發",
       "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "days",
-              "daysInterval": 1
-            }
-          ]
-        }
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA",
+        "options": {}
       },
-      "position": [
-        250,
-        300
-      ]
-    },
-    {
-      "id": "2",
       "type": "n8n-nodes-base.rssFeedRead",
-      "typeVersion": 1,
-      "name": "RSS 讀取",
-      "parameters": {
-        "url": "https://example.com/feed.xml"
-      },
+      "typeVersion": 1.2,
       "position": [
-        450,
-        300
-      ]
+        -256,
+        112
+      ],
+      "id": "7209da82-2325-47a2-9a2d-4d88da276e44",
+      "name": "RSS Read (YT)"
     },
     {
-      "id": "3",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "name": "判斷是否今日",
       "parameters": {
         "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
           "conditions": [
             {
-              "id": "1",
+              "id": "fe295a97-2186-4f28-bc72-85521e1e5412",
               "leftValue": "={{ $json.pubDate }}",
-              "rightValue": "={{ $now.minus(1, 'day').toISO() }}",
+              "rightValue": "={{ DateTime.now().startOf('day').minus(7, 'days') }}",
               "operator": {
                 "type": "dateTime",
                 "operation": "after"
               }
             }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -32,
+        112
+      ],
+      "id": "637c13fe-63bb-48b0-9d18-940bdb692b32",
+      "name": "篩選出7天內更新的作品",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5934dba-1f01-4f55-98f3-f805410e96f4",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        112
+      ],
+      "id": "8aeaf548-9921-4548-991f-a5d86202ea18",
+      "name": "檢查是否有更新"
+    },
+    {
+      "parameters": {
+        "fromEmail": "andychuah99@gmail.com",
+        "toEmail": "andychuah99@gmail.com",
+        "subject": "今天的內容創作很精彩，趕快來看看！",
+        "emailFormat": "text",
+        "text": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        16
+      ],
+      "id": "61335341-c414-462d-903b-f356683f7721",
+      "name": "Send email (With update)",
+      "webhookId": "fb22de40-7354-4c33-80da-01dafe232cef"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get all input items\nconst items = $input.all();\n\n// 2. If no data, return early\nif (items.length === 0) {\n  return [{ json: { body: '今天沒有新的更新。' } }];\n}\n\n// 3. Aggregate items into a single string\nlet body = '📢 今日更新彙整：\\n\\n';\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i].json;\n  \n  // Using backticks (`) for clean multiline template literals\n  body += `${i + 1}. ${item.title}\\n`;\n  body += `🔗 ${item.link}\\n`;\n  \n  if (item.author) {\n    body += `👤 ${item.author}\\n`;\n  }\n  \n  body += '\\n'; // Add space between items\n}\n\nbody += '---\\n由 n8n 自動整理發送';\n\n// 4. Return the aggregated data as a single item\nreturn [{ json: { body: body } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        16
+      ],
+      "id": "982b682b-f8f0-4162-aa61-ecd8e440e0a3",
+      "name": "彙整資料"
+    },
+    {
+      "parameters": {
+        "fromEmail": "andychuah99@gmail.com",
+        "toEmail": "andychuah99@gmail.com",
+        "subject": "你追蹤的頻道今天沒有更新喔！n8n 仍在正常運作中",
+        "emailFormat": "text",
+        "text": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        208
+      ],
+      "id": "3420cb69-f67d-4431-9c39-c50d9efc1c0d",
+      "name": "Send email (Without new update)",
+      "webhookId": "fb22de40-7354-4c33-80da-01dafe232cef"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 19
+            }
           ]
         }
       },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
       "position": [
-        650,
-        300
-      ]
-    },
-    {
-      "id": "4",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 1,
-      "name": "寄送新文章通知",
-      "parameters": {
-        "fromEmail": "your@email.com",
-        "toEmail": "you@email.com",
-        "subject": "=新文章：{{ $json.title }}"
-      },
-      "position": [
-        850,
-        200
-      ]
-    },
-    {
-      "id": "5",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 1,
-      "name": "寄送無更新通知",
-      "parameters": {
-        "fromEmail": "your@email.com",
-        "toEmail": "you@email.com",
-        "subject": "今日無新文章"
-      },
-      "position": [
-        850,
-        400
-      ]
+        -480,
+        112
+      ],
+      "id": "d54cd9b6-a804-4215-a21b-e6461e3dfc34",
+      "name": "Schedule Trigger"
     }
   ],
+  "pinData": {},
   "connections": {
-    "每日觸發": {
+    "RSS Read (YT)": {
       "main": [
         [
           {
-            "node": "RSS 讀取",
+            "node": "篩選出7天內更新的作品",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "RSS 讀取": {
+    "篩選出7天內更新的作品": {
       "main": [
         [
           {
-            "node": "判斷是否今日",
+            "node": "檢查是否有更新",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "判斷是否今日": {
+    "檢查是否有更新": {
       "main": [
         [
           {
-            "node": "寄送新文章通知",
+            "node": "彙整資料",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "寄送無更新通知",
+            "node": "Send email (Without new update)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "彙整資料": {
+      "main": [
+        [
+          {
+            "node": "Send email (With update)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read (YT)",
             "type": "main",
             "index": 0
           }
@@ -133,9 +220,14 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 7：IF 節點 - 根據條件走不同分支"
+  "versionId": "a618ae23-8ce4-4fd7-810b-539fa530d74e",
+  "meta": {
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "vzywxTnugMWp8dAB",
+  "tags": []
 }

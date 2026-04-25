@@ -2,92 +2,258 @@
   "name": "Day 24 - 新客戶自動歡迎流程",
   "nodes": [
     {
-      "id": "1",
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "id": "68fb116f-78ce-48fc-950b-969a3ff7e71e",
       "type": "n8n-nodes-base.googleSheetsTrigger",
       "typeVersion": 1,
       "name": "新客戶加入",
-      "parameters": {
-        "sheetId": "YOUR_SHEET_ID",
-        "event": "rowAdded"
-      },
       "position": [
-        250,
-        300
+        0,
+        -48
       ]
     },
     {
-      "id": "2",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 1,
-      "name": "整理客戶資料",
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "1",
-              "name": "name",
-              "value": "={{ $json.姓名 }}",
-              "type": "string"
-            },
-            {
-              "id": "2",
-              "name": "email",
-              "value": "={{ $json.Email }}",
-              "type": "string"
-            }
-          ]
-        }
-      },
-      "position": [
-        450,
-        300
-      ]
-    },
-    {
-      "id": "3",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 1,
-      "name": "寄送歡迎信",
       "parameters": {
         "fromEmail": "hello@yourcompany.com",
         "toEmail": "={{ $json.email }}",
         "subject": "=歡迎加入！{{ $json.name }} 😊",
-        "message": "=<h2>嗨，{{ $json.name }}！</h2><p>歡迎加入！我們很高興有你。</p>"
+        "html": "=<p>{{ $json.contact_person }} 您好，</p>\n<p>非常感謝您選擇與我們合作！</p>\n<p>我們已經為您的專案準備好了以下資源：</p>\n<ul>\n<li>專案追蹤：<a href=\"{{ $json.jira_url }}\">Jira 專案</a></li> <li>資料頁面：<a href=\"{{ $json.notion_url }}\">Notion 頁面</a></li> <li>共用資料夾：<a href=\"{{ $json.drive_url }}\">Google Drive</a></li>\n</ul>\n<p>我們的團隊會盡快與您聯繫，討論專案的下一步。</p>\n<p>如有任何問題，請隨時與我們聯繫。</p>\n<p>祝合作愉快！</p>\n",
+        "options": {}
       },
+      "id": "439055fc-c936-470b-b2f5-78913d37dbd3",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "name": "寄送歡迎信",
       "position": [
-        650,
-        300
+        1392,
+        -48
       ]
     },
     {
-      "id": "4",
+      "parameters": {
+        "text": "=🎉 新客戶加入！  公司名稱：{{ $json.client_name }} 聯絡人：{{ $json.contact_person }} 專案類型：{{ $json.project_type }}  📋 相關連結： • Jira：{{ $json.jira_url }} • Notion：{{ $json.notion_url }} • Drive：{{ $json.drive_url }}",
+        "otherOptions": {},
+        "attachments": []
+      },
+      "id": "d22d7172-3380-432b-99ba-d0be3ea8a5f6",
       "type": "n8n-nodes-base.slack",
       "typeVersion": 1,
       "name": "通知業務團隊",
-      "parameters": {
-        "operation": "sendMessage",
-        "channel": "#new-customers",
-        "text": "=🎉 新客戶加入：*{{ $json.name }}*（{{ $json.email }}）"
-      },
       "position": [
-        650,
-        500
-      ]
+        1600,
+        -48
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "8QwjAIhSXjtx1mny",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "chatInput"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "你是一位熱血且專業的商業拓展助理。  當收到新客戶名稱時，請你完成以下兩項任務：  任務一：公司背景調查 請你【務必使用 Search Tool】上網查詢這家公司的最新資訊，並整理出： 該公司的簡介（50 字以內） 主要產業領域 公司規模（如果能找到） 注意：嚴禁憑空捏造，查不到請誠實說明。  任務二：撰寫 Slack 團隊歡迎詞 根據你查到的公司背景，寫一段約 30-50 字、熱血且鼓舞團隊士氣的 Slack 慶祝短語。（例如：「這是一家在 AI 領域非常有潛力的新創，大家準備好大展身手了嗎！」）  請嚴格以 JSON 格式回傳，格式如下： { \"background\": \"你查到的背景資料...\", \"slack_cheer\": \"你寫的熱血歡迎詞...\" } 如果找不到資訊，請誠實說明。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        -48
+      ],
+      "id": "c3bf0a86-3a6d-4113-8007-66314191f373",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2UQWMg6VZejfU8DU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "915d4c28-bc40-49f9-9260-a2e3037ab352",
+              "name": "chatInput",
+              "value": "={{ json.client_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "a44578ae-6c06-4161-a23b-412f2fdbef3e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "issueType": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -48
+      ],
+      "id": "fcd9d9cf-4381-4f99-8af2-77bdb9ff033a",
+      "name": "Create an issue"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        -48
+      ],
+      "id": "1214b4d9-d07d-4dcf-a5d4-c30a008e5908",
+      "name": "Create a database page"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1184,
+        -48
+      ],
+      "id": "b7a014c3-3cad-4ec5-9064-bc88b6c4d630",
+      "name": "Create folder"
     }
   ],
+  "pinData": {},
   "connections": {
     "新客戶加入": {
       "main": [
         [
           {
-            "node": "整理客戶資料",
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "整理客戶資料": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Create an issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an issue": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page": {
+      "main": [
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder": {
       "main": [
         [
           {
@@ -95,7 +261,11 @@
             "type": "main",
             "index": 0
           }
-        ],
+        ]
+      ]
+    },
+    "寄送歡迎信": {
+      "main": [
         [
           {
             "node": "通知業務團隊",
@@ -107,9 +277,14 @@
     }
   },
   "active": false,
-  "settings": {},
-  "meta": {
-    "instanceId": "n8n-30days-demo"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "description": "Day 24：新客戶自動歡迎 - Email + Slack 雙重通知"
+  "versionId": "26f48f62-dbae-48a7-9d8a-72028c3fee76",
+  "meta": {
+    "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
+  },
+  "id": "EoorRYFG3cGv2MWa",
+  "tags": []
 }

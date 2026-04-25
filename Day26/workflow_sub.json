@@ -1,5 +1,5 @@
 {
-  "name": "Sub - AI 文字處理器",
+  "name": "Day26 : Sub - AI 文字處理器",
   "nodes": [
     {
       "parameters": {
@@ -75,7 +75,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "5c0e325e-c11c-4010-b3c5-aff13a7c91b4",
+  "versionId": "156c9968-ff97-42ab-905c-759b66ce25d2",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "623d21ab76e71fa91bf59f120ff6d6655c4e6d45ce5692737242a9f048ad65f8"
