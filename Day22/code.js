@@ -10,7 +10,7 @@ const rawText = $input.first().json.content.parts[0].text;  // Google Gemini
 // const rawText = $input.first().json.output;              // OpenAI GPT
 
 // 1. 提取主旨：抓取「主旨：」後面的內容
-const subjectMatch = rawText.match(/主旨：\s*(.*)/);
+const subjectMatch = rawText.match(/主旨[：:]\s*(.*)/);
 const cleanSubject = subjectMatch ? subjectMatch[1].trim() : '（AI 自動生成回覆）';
 
 // 2. 提取內文：抓取草稿區塊，並把裡面的「主旨：...」這行刪除
