@@ -1,0 +1,50 @@
+{
+  "name": "Demo Sender：寄出會議測試信",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "67a5864f-096d-40d4-a862-c6e7cbebfe10",
+      "name": "手動測試",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "sendTo": "replace-with-your-demo-inbox@gmail.com",
+        "subject": "週五會議可以改到三點嗎？",
+        "emailType": "text",
+        "message": "嗨 Andy，\n\n因為上午臨時有安排，想問週五的會議是否方便改到下午三點？如果不方便，也請告訴我你可以的時間。\n\n謝謝！",
+        "options": {}
+      },
+      "id": "89b817ca-bfab-47f0-9a5c-afbd5ba935d4",
+      "name": "寄出會議測試信",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [240, 0]
+    }
+  ],
+  "connections": {
+    "手動測試": {
+      "main": [
+        [
+          {
+            "node": "寄出會議測試信",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "versionId": "047e3d67-f355-4d35-a3d3-0f418576633d",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

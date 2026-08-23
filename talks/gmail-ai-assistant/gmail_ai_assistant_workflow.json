@@ -1,0 +1,298 @@
+{
+  "id": "GmailDemoLocal01",
+  "name": "Gmail AI 助理：自動分類並建立回覆草稿",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ① 新郵件進來\nGmail Trigger 每分鐘查看新郵件，排除自己寄出的信。",
+        "height": 300,
+        "width": 300
+      },
+      "id": "e4c89800-1e20-46ee-8cae-621f7c82f222",
+      "name": "說明：收到郵件",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-980, 180]
+    },
+    {
+      "parameters": {
+        "content": "## ② Gemini 看懂郵件\n只回傳固定 JSON：分類、是否需要回覆、一行摘要、回覆草稿。",
+        "height": 460,
+        "width": 520
+      },
+      "id": "ca1c6c74-8dce-43cf-a13e-dbf23ad72c46",
+      "name": "說明：AI 判斷",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-640, 80]
+    },
+    {
+      "parameters": {
+        "content": "## ③ n8n 貼上 Gmail 標籤\n依照 AI 的分類，找出對應標籤 ID，再套用到原始郵件。",
+        "height": 380,
+        "width": 560
+      },
+      "id": "89f855e9-88cc-467e-822b-b808207094cb",
+      "name": "說明：貼標籤",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-80, 120]
+    },
+    {
+      "parameters": {
+        "content": "## ④ 只建立草稿，不自動寄出\n只有「待回覆」或需要回應的「會議」郵件會進入這條分支。人看過、修改後才寄。",
+        "height": 380,
+        "width": 520
+      },
+      "id": "7ea8c23f-1005-4bf4-8270-238210864857",
+      "name": "說明：草稿審核",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [520, 120]
+    },
+    {
+      "parameters": {
+        "content": "## 一次性設定：建立五個 Demo 標籤\n先綁定 Gmail Credential，再手動執行這條支線一次。已經建立過就不要重跑。",
+        "height": 340,
+        "width": 700
+      },
+      "id": "fab0dbbc-afd0-466a-851b-504641432437",
+      "name": "說明：一次性設定",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-980, -360]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "-from:me"
+        },
+        "options": {}
+      },
+      "id": "9b401844-9501-48d2-aaea-3583df4dfb36",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [-900, 320]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "id": "3c3af8f9-b811-4ca8-b470-feeb8f4821b8",
+      "name": "取得完整郵件",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [-720, 320]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=請分析以下郵件。\n\n寄件者：{{ $json.from?.value?.[0]?.address || $json.headers?.from || $json.from }}\n收件者：{{ $json.to?.value?.map(r => r.address).join(', ') || $json.headers?.to || $json.to }}\n主旨：{{ $json.subject || $json.headers?.subject }}\n內文：{{ $json.text || $json.textPlain || $json.textAsHtml || $json.snippet }}\nHeaders：{{ JSON.stringify($json.headers || {}) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是協助上班族整理 Gmail 的助理。你的工作是分類郵件，並在確實需要回覆時準備一份讓人審核的草稿。\n\n只能使用以下五種分類：\n1. 待回覆：直接詢問、交辦、需要資訊或需要明確回應。\n2. 會議：會議邀請、改期、取消或時間協調。\n3. FYI：只需要知道，不需要立刻回應。\n4. 通知：系統、帳號、維護、安全或服務更新。\n5. 行銷：促銷、電子報、陌生銷售或含退訂連結的推廣。\n\n判斷 needsReply：\n- 待回覆通常為 true。\n- 會議只有對方要求確認或協調時才是 true；單純接受通知為 false。\n- FYI、通知、行銷一律為 false。\n- no-reply、noreply、auto-submitted、bulk 郵件一律為 false。\n\n草稿規則：\n- needsReply=false 時，draftHtml 必須是空字串。\n- needsReply=true 時，使用與來信相同的語言。\n- 語氣自然、溫暖、簡潔，像真人上班族，不要過度客套。\n- 使用 HTML 的 <p> 段落，不要加入完整 HTML/body 標籤。\n- 不要加入簽名。\n- 不要虛構承諾、價格、批准、工作完成狀態或可用時間。\n- 不確定時明確說需要確認，例如「我先確認行程後再回覆你」。\n\nsummary 請用一個短句說明對方要什麼。\n請只依照 Structured Output Parser 指定的 JSON 格式輸出。"
+        }
+      },
+      "id": "a8134e28-09db-42e5-8dcf-c42343a55496",
+      "name": "Gemini 分類並起草",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [-500, 320]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.7-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "0e761090-2c02-4cc0-92e4-15ac43bb5cec",
+      "name": "Gemini 3.7 Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [-500, 500]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"category\": \"待回覆\",\n  \"needsReply\": true,\n  \"summary\": \"對方希望確認週五會議是否能改到下午三點。\",\n  \"draftHtml\": \"<p>你好，</p><p>謝謝通知。我先確認行程，稍後回覆你。</p>\"\n}"
+      },
+      "id": "020dbbdc-1149-42fb-babe-04ee3ca8cb0f",
+      "name": "固定 JSON 格式",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [-300, 500]
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "getAll",
+        "returnAll": true
+      },
+      "id": "d75a3590-13fc-4ca0-8776-0921590454ee",
+      "name": "讀取 Gmail 標籤",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [-20, 320]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const raw = $('Gemini 分類並起草').first().json.output;\nconst ai = typeof raw === 'string' ? JSON.parse(raw) : raw;\nconst source = $('取得完整郵件').first().json;\nconst trigger = $('Gmail Trigger').first().json;\n\nconst labelMap = {\n  '待回覆': '01_待回覆',\n  '會議': '02_會議',\n  'FYI': '03_FYI',\n  '通知': '04_通知',\n  '行銷': '05_行銷',\n};\n\nconst labelName = labelMap[ai.category] || '03_FYI';\nconst labels = $input.all().flatMap(item => Array.isArray(item.json.labels) ? item.json.labels : [item.json]);\nconst matched = labels.find(label => label.name === labelName);\nif (!matched) {\n  throw new Error(`找不到 Gmail 標籤 ${labelName}。請先執行上方「一次性設定」支線。`);\n}\n\nconst rawFrom = trigger.headers?.from || source.from?.value?.[0]?.address || source.from || '';\nconst addressMatch = String(rawFrom).match(/<([^>]+)>/);\nconst toEmail = addressMatch ? addressMatch[1] : String(rawFrom);\nconst subject = source.subject || String(trigger.headers?.subject || '').replace(/^Subject:\\s*/i, '');\n\nreturn [{\n  json: {\n    category: ai.category,\n    needsReply: Boolean(ai.needsReply),\n    summary: ai.summary || '',\n    draftHtml: ai.draftHtml || '',\n    labelName,\n    labelId: matched.id,\n    messageId: source.id || trigger.id,\n    threadId: source.threadId || trigger.threadId,\n    toEmail,\n    subject,\n  },\n}];"
+      },
+      "id": "7d7e89b7-12d0-49e3-b38d-28f72870eea6",
+      "name": "配對標籤 ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [180, 320]
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.messageId }}",
+        "labelIds": "={{ $json.labelId }}"
+      },
+      "id": "a7266978-fe45-4e72-af03-d4b91d6999bf",
+      "name": "套用分類標籤",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [400, 320]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "03ae06f4-d05b-46c1-8ee5-5fd7861244b1",
+              "leftValue": "={{ $('配對標籤 ID').item.json.needsReply }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1ef3e21d-71e6-4362-9864-640d2a4a3aa0",
+      "name": "需要回覆嗎？",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [620, 320]
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "create",
+        "subject": "=Re: {{ $('配對標籤 ID').item.json.subject }}",
+        "emailType": "html",
+        "message": "={{ $('配對標籤 ID').item.json.draftHtml }}",
+        "options": {
+          "sendTo": "={{ $('配對標籤 ID').item.json.toEmail }}",
+          "threadId": "={{ $('配對標籤 ID').item.json.threadId }}"
+        }
+      },
+      "id": "5a16c1cb-0821-4a58-9077-415726457523",
+      "name": "建立 Gmail 回覆草稿",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [840, 260]
+    },
+    {
+      "parameters": {},
+      "id": "e0b5dc46-2498-45d0-890b-a65cf2f8b662",
+      "name": "一次性：建立 Demo 標籤",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-900, -180]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [\n  '01_待回覆',\n  '02_會議',\n  '03_FYI',\n  '04_通知',\n  '05_行銷',\n].map(name => ({ json: { name } }));"
+      },
+      "id": "5daf32bf-d6cf-4b7a-a5a4-8573b2037564",
+      "name": "準備五個標籤",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-680, -180]
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "create",
+        "name": "={{ $json.name }}"
+      },
+      "id": "91e6ec52-2da0-46a7-8380-a684958cf591",
+      "name": "建立 Gmail 標籤",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [-440, -180]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [[{"node": "取得完整郵件", "type": "main", "index": 0}]]
+    },
+    "取得完整郵件": {
+      "main": [[{"node": "Gemini 分類並起草", "type": "main", "index": 0}]]
+    },
+    "Gemini 3.7 Flash": {
+      "ai_languageModel": [[{"node": "Gemini 分類並起草", "type": "ai_languageModel", "index": 0}]]
+    },
+    "固定 JSON 格式": {
+      "ai_outputParser": [[{"node": "Gemini 分類並起草", "type": "ai_outputParser", "index": 0}]]
+    },
+    "Gemini 分類並起草": {
+      "main": [[{"node": "讀取 Gmail 標籤", "type": "main", "index": 0}]]
+    },
+    "讀取 Gmail 標籤": {
+      "main": [[{"node": "配對標籤 ID", "type": "main", "index": 0}]]
+    },
+    "配對標籤 ID": {
+      "main": [[{"node": "套用分類標籤", "type": "main", "index": 0}]]
+    },
+    "套用分類標籤": {
+      "main": [[{"node": "需要回覆嗎？", "type": "main", "index": 0}]]
+    },
+    "需要回覆嗎？": {
+      "main": [[{"node": "建立 Gmail 回覆草稿", "type": "main", "index": 0}], []]
+    },
+    "一次性：建立 Demo 標籤": {
+      "main": [[{"node": "準備五個標籤", "type": "main", "index": 0}]]
+    },
+    "準備五個標籤": {
+      "main": [[{"node": "建立 Gmail 標籤", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4b95bbad-6e1f-4a59-9050-03671405f02d",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
